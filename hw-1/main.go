@@ -10,14 +10,11 @@ import (
 func main() {
 	ntpTime, err := ntp.Time("0.beevik-ntp.pool.ntp.org")
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		fmt.Fprintln(os.Stderr, "error: ", err)
 		os.Exit(1)
 	}
 
 	currentTime := time.Now()
-	fmt.Println("Current Time:")
-	fmt.Println(currentTime)
-
-	fmt.Println("Exact Time:")
-	fmt.Println(ntpTime)
+	fmt.Println("Current Time: ", currentTime)
+	fmt.Println("Exact Time: ", ntpTime)
 }
