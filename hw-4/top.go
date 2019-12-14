@@ -23,7 +23,7 @@ func Top10(s string) (res []string) {
 
 	sort.Sort(sort.Reverse(p))
 
-	for j := 0; j < 10; j++ {
+	for j := 0; j < len(p) && j < 10; j++ {
 		res = append(res, p[j].Key)
 	}
 
