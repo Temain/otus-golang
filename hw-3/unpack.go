@@ -7,9 +7,10 @@ import (
 	"unicode"
 )
 
+// Unpack выполняет распаковку строки, содержащую повторяющиеся символы.
 func Unpack(s string) (r string, err error) {
 	if _, err := strconv.Atoi(s); err == nil {
-		return r, errors.New("Некорректная строка.")
+		return r, errors.New("некорректная строка")
 	}
 
 	var prev rune

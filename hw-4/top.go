@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// Top10 возвращает 10 самых частовстречающихся в тексте слов.
 func Top10(s string) (res []string) {
 	s = clear(s)
 	words := strings.Fields(s)

@@ -1,12 +1,12 @@
 package top
 
-// A data structure to hold key/value pairs
+// Pair is a data structure to hold key/value pairs
 type Pair struct {
 	Key   string
 	Value int
 }
 
-// A slice of pairs that implements sort.Interface to sort by values
+// PairList is a slice of pairs that implements sort.Interface to sort by values
 type PairList []Pair
 
 func (p PairList) Len() int           { return len(p) }
