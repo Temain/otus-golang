@@ -15,18 +15,20 @@ func Unpack(s string) (r string, err error) {
 
 	var prev rune
 	var escaped bool
+	var b strings.Builder
 	for _, char := range s {
 		if unicode.IsDigit(char) && !escaped {
-			mult := int(char - '0')
-			r = r + strings.Repeat(string(prev), mult-1)
+			m := int(char - '0')
+			r := strings.Repeat(string(prev), m-1)
+			b.WriteString(r)
 		} else {
 			escaped = string(char) == "\\" && string(prev) != "\\"
 			if !escaped {
-				r = r + string(char)
+				b.WriteRune(char)
 			}
 			prev = char
 		}
 	}
 
-	return r, err
+	return b.String(), err
 }
