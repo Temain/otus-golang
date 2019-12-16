@@ -12,7 +12,7 @@ func TestTop10(t *testing.T) {
 	}
 
 	text := string(data)
-	e := []string{"the", "a", "to", "of", "is", "and", "you", "we", "that", "go"}
+	e := []string{"the", "a", "to", "you", "of", "is", "we", "and", "go", "it"}
 	r := Top10(text)
 	if !testEq(r, e) {
 		t.Fatalf("Wrong top 10 words: got %v expected %v", r, e)

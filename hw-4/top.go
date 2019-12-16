@@ -3,36 +3,39 @@ package top
 import (
 	"sort"
 	"strings"
+	"unicode"
 )
 
 // Top10 возвращает 10 самых частовстречающихся в тексте слов.
-func Top10(s string) (res []string) {
-	s = clear(s)
-	words := strings.Fields(s)
+func Top10(s string) []string {
+	words := prepare(s)
 	counts := make(map[string]int)
 	for _, word := range words {
 		counts[word]++
 	}
 
-	p := make(PairList, len(counts))
-
-	i := 0
+	p := make(PairList, 0, len(counts))
 	for k, v := range counts {
-		p[i] = Pair{k, v}
-		i++
+		p = append(p, Pair{k, v})
 	}
 
 	sort.Sort(sort.Reverse(p))
 
-	for j := 0; j < len(p) && j < 10; j++ {
-		res = append(res, p[j].Key)
+	res := make([]string, 0, 10)
+	for j, pair := range p {
+		if j >= 10 {
+			break
+		}
+		res = append(res, pair.Key)
 	}
 
 	return res
 }
 
-func clear(s string) string {
+func prepare(s string) []string {
 	s = strings.ToLower(s)
-	replacer := strings.NewReplacer(",", "", ".", "", ";", "", "-", "", "{", "", "}", "")
-	return replacer.Replace(s)
+	f := func(c rune) bool {
+		return !unicode.IsLetter(c) && !unicode.IsNumber(c)
+	}
+	return strings.FieldsFunc(s, f)
 }
