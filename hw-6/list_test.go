@@ -1,4 +1,4 @@
-package hw_6
+package list
 
 import (
 	"testing"
@@ -47,6 +47,11 @@ func TestListPushFront(t *testing.T) {
 	if listFirst.Value() != newVal {
 		t.Fatalf("bad first item %d after push front: expected %d", listFirst.Value(), newVal)
 	}
+
+	firstNext := listFirst.Next()
+	if firstNext.Value() != newVal+1 {
+		t.Fatalf("bad first next item %d after push front: expected %d", firstNext.Value(), newVal+1)
+	}
 }
 
 func TestListPushBack(t *testing.T) {
@@ -55,7 +60,12 @@ func TestListPushBack(t *testing.T) {
 	list.PushBack(newVal)
 	listLast := list.Last()
 	if listLast.Value() != newVal {
-		t.Fatalf("bad first item %d after push front: expected %d", listLast.Value(), newVal)
+		t.Fatalf("bad last item %d after push back: expected %d", listLast.Value(), newVal)
+	}
+
+	lastPrev := listLast.Prev()
+	if lastPrev.Value() != newVal-1 {
+		t.Fatalf("bad last prev item %d after push back: expected %d", lastPrev.Value(), newVal-1)
 	}
 }
 
@@ -69,8 +79,8 @@ func TestListRemove(t *testing.T) {
 		t.Fatalf("bad list len %d after remove: expected %d", list.len, expLen)
 	}
 
-	equals := first.Value() == newFirst.Value()
-	if equals {
-		t.Fatalf("bad first item %d after remove: expected not %d", newFirst.Value(), first.Value())
+	expVal := 2
+	if newFirst.Value() != expVal {
+		t.Fatalf("bad first item %d after remove: expected %d", newFirst.Value(), expVal)
 	}
 }

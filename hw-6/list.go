@@ -1,23 +1,28 @@
-package hw_6
+package list
 
+// List двусвязный список.
 type List struct {
 	len   int
 	first *Item
 	last  *Item
 }
 
+// Len получить длинну списка.
 func (list List) Len() int {
 	return list.len
 }
 
+// First получить указатель на первый элемент списка.
 func (list List) First() *Item {
 	return list.first
 }
 
+// Last получить указатель на последний элемент списка.
 func (list List) Last() *Item {
 	return list.last
 }
 
+// PushFront добавить элемент со значнием v в начало списка.
 func (list *List) PushFront(v interface{}) {
 	item := Item{val: v}
 	temp := list.first
@@ -31,6 +36,7 @@ func (list *List) PushFront(v interface{}) {
 	list.len++
 }
 
+// PushBack добавить элемент со значнием v в конец списка.
 func (list *List) PushBack(v interface{}) {
 	item := Item{val: v}
 	temp := list.last
@@ -44,6 +50,7 @@ func (list *List) PushBack(v interface{}) {
 	list.len++
 }
 
+// Remove удалить элемент из списка.
 func (list *List) Remove(item Item) {
 	prev := item.prev
 	next := item.next
