@@ -13,8 +13,8 @@ func Run(tasks []func() error, n int, m int) (err error, s int, e int) {
 	killCh := make(chan bool)
 
 	// Запуск воркеров.
-	for i := 0; i < n; i++ {
-		go worker(queueCh, doneCh, killCh)
+	for i := 1; i <= n; i++ {
+		go worker(i, queueCh, doneCh, killCh)
 	}
 
 	// Отправка задач в очередь к воркерам.
@@ -30,7 +30,7 @@ func Run(tasks []func() error, n int, m int) (err error, s int, e int) {
 		if !done {
 			e++
 			if e == m {
-				err = errors.New("превышено предельное количество ошибок")
+				err = errors.New("too many errors")
 				break
 			}
 		}
@@ -44,15 +44,16 @@ func Run(tasks []func() error, n int, m int) (err error, s int, e int) {
 	return err, s, e
 }
 
-func worker(queueCh chan func() error, doneCh chan bool, killCh chan bool) {
-	fmt.Println("worker started")
+func worker(num int, queueCh chan func() error, doneCh chan bool, killCh chan bool) {
+	fmt.Printf("worker %d started\n", num)
 	for {
 		select {
 		case task := <-queueCh:
+			fmt.Printf("worker %d running task...\n", num)
 			err := task()
 			doneCh <- err == nil
 		case <-killCh:
-			fmt.Println("worker stopped")
+			fmt.Printf("worker %d stopped\n", num)
 			return
 		}
 	}
