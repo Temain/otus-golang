@@ -39,11 +39,11 @@ func TestErrors(t *testing.T) {
 			fmt.Println("task #2 with error")
 			return errors.New("error #2")
 		},
+		func() error { fmt.Println("task #3"); return nil },
 		func() error {
-			fmt.Println("task #3 with error")
-			return errors.New("error #3")
+			fmt.Println("task #4 with error")
+			return errors.New("error #4")
 		},
-		func() error { fmt.Println("task #4"); return nil },
 		func() error { fmt.Println("task #5"); return nil },
 		func() error { fmt.Println("task #6"); return nil },
 		func() error { fmt.Println("task #7"); return nil },
@@ -52,9 +52,12 @@ func TestErrors(t *testing.T) {
 		func() error { fmt.Println("task #10"); return nil },
 	}
 	n, m := 2, 2
-	err, _, e := Run(tasks, n, m)
+	err, s, e := Run(tasks, n, m)
 	if e != m {
 		t.Fatalf("bad error tasks %d expected %d", e, m)
+	}
+	if e+s > n+m {
+		t.Fatalf("bad completed tasks %d expected max %d", e+s, n+m)
 	}
 	if err == nil {
 		t.Fatalf("bad result expected error")
