@@ -1,6 +1,7 @@
 package copier
 
 import (
+	"github.com/cheggaaa/pb"
 	"io"
 	"os"
 )
@@ -12,11 +13,13 @@ func Copy(from string, to string, limit int, offset int) error {
 		return err
 	}
 
+	bar := pb.Full.Start64(int64(limit))
+	sourceReader := bar.NewProxyReader(sourceFile)
+
 	targetFile, _ := os.Create(to)
 	defer targetFile.Close()
-	if _, err := io.CopyN(targetFile, sourceFile, int64(limit)); err != nil {
-		return err
-	}
+	_, err := io.CopyN(targetFile, sourceReader, int64(limit))
+	bar.Finish()
 
-	return nil
+	return err
 }
