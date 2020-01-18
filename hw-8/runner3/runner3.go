@@ -12,12 +12,10 @@ func Run(tasks []func() error, n int, m int) (err error, s int, e int) {
 	var wg sync.WaitGroup
 	for _, task := range tasks {
 		guardCh <- struct{}{}
-		mu.RLock()
-		if e >= m {
-			err = errors.New("too many errors")
+		err = checkErrors(&e, &m, &mu)
+		if err != nil {
 			break
 		}
-		mu.RUnlock()
 
 		wg.Add(1)
 		go func(task func() error) {
@@ -26,13 +24,7 @@ func Run(tasks []func() error, n int, m int) (err error, s int, e int) {
 				<-guardCh
 			}()
 			err := task()
-			mu.Lock()
-			defer mu.Unlock()
-			if err != nil {
-				e++
-			} else {
-				s++
-			}
+			checkResults(&s, &e, &mu, err)
 		}(task)
 	}
 
@@ -40,4 +32,23 @@ func Run(tasks []func() error, n int, m int) (err error, s int, e int) {
 	wg.Wait()
 
 	return err, s, e
+}
+
+func checkErrors(e *int, m *int, mu *sync.RWMutex) error {
+	mu.RLock()
+	defer mu.RUnlock()
+	if *e >= *m {
+		return errors.New("too many errors")
+	}
+	return nil
+}
+
+func checkResults(s *int, e *int, mu *sync.RWMutex, err error) {
+	mu.Lock()
+	defer mu.Unlock()
+	if err != nil {
+		*e++
+	} else {
+		*s++
+	}
 }
