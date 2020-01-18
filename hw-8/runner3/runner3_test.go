@@ -1,4 +1,4 @@
-package runner2
+package runner3
 
 import (
 	"errors"
@@ -21,7 +21,7 @@ func TestSuccess(t *testing.T) {
 	}
 	_, s, e := Run(tasks, 2, 2)
 	ln := len(tasks)
-	if s != ln {
+	if int(s) != ln {
 		t.Fatalf("bad success tasks %d expected %d", s, ln)
 	}
 	if e != 0 {
@@ -39,11 +39,11 @@ func TestErrors(t *testing.T) {
 			fmt.Println("task #2 with error")
 			return errors.New("error #2")
 		},
+		func() error { fmt.Println("task #3"); return nil },
 		func() error {
-			fmt.Println("task #3 with error")
-			return errors.New("error #3")
+			fmt.Println("task #4 with error")
+			return errors.New("error #4")
 		},
-		func() error { fmt.Println("task #4"); return nil },
 		func() error { fmt.Println("task #5"); return nil },
 		func() error { fmt.Println("task #6"); return nil },
 		func() error { fmt.Println("task #7"); return nil },
@@ -53,9 +53,6 @@ func TestErrors(t *testing.T) {
 	}
 	n, m := 2, 2
 	err, s, e := Run(tasks, n, m)
-	if e != m {
-		t.Fatalf("bad error tasks %d expected %d", e, m)
-	}
 	if e+s > n+m {
 		t.Fatalf("bad completed tasks %d expected max %d", e+s, n+m)
 	}

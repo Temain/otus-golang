@@ -18,11 +18,11 @@ func Run(tasks []func() error, n int, m int) (err error, s int, e int) {
 	}
 
 	// Отправка задач в очередь к воркерам.
-	for _, task := range tasks {
-		go func(task func() error) {
+	go func() {
+		for _, task := range tasks {
 			queueCh <- task
-		}(task)
-	}
+		}
+	}()
 
 	// Проверка результатов выполнения задач.
 	for range tasks {
@@ -44,7 +44,7 @@ func Run(tasks []func() error, n int, m int) (err error, s int, e int) {
 	return err, s, e
 }
 
-func worker(num int, queueCh chan func() error, doneCh chan bool, killCh chan bool) {
+func worker(num int, queueCh <-chan func() error, doneCh chan<- bool, killCh <-chan bool) {
 	fmt.Printf("worker %d started\n", num)
 	for {
 		select {
