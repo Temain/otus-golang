@@ -4,12 +4,15 @@ import (
 	"flag"
 	"github.com/Temain/otus-golang/hw-10/copier"
 	"log"
+	"strings"
 )
 
-var from string
-var to string
-var limit int
-var offset int
+var (
+	from   string
+	to     string
+	limit  int
+	offset int
+)
 
 func init() {
 	flag.StringVar(&from, "from", "", "source file")
@@ -21,10 +24,12 @@ func init() {
 func main() {
 	flag.Parse()
 
-	//log.Printf("%v", from)
-	//log.Printf("%v", to)
-	//log.Printf("%v", limit)
-	//log.Printf("%v", offset)
+	if len(strings.TrimSpace(from)) == 0 {
+		log.Fatal("empty -from arg, see --help")
+	}
+	if len(strings.TrimSpace(to)) == 0 {
+		log.Fatal("empty -to arg, see --help")
+	}
 
 	err := copier.Copy(from, to, limit, offset)
 	if err != nil {

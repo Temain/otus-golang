@@ -14,3 +14,6 @@
 - Все необходимые для тестов файлы должны создаваться в самом тесте
 - Код должен проходить проверки go vet и golint
 - У преподавателя должна быть возможность скачать, проверить и установить пакет с помощью go get / go test / go install 
+
+Пример запуска:
+go run main.go -from '/home/temain/Documents/book.txt' -to '/home/temain/Documents/book_copy.txt' -limit 100000 -offset 1
