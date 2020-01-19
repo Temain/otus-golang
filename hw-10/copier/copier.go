@@ -1,4 +1,4 @@
-package copier
+package hw_10
 
 import (
 	"fmt"
