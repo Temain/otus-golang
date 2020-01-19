@@ -1,10 +1,11 @@
-package hw_10
+package copier
 
 import (
 	"fmt"
-	"github.com/cheggaaa/pb"
 	"io"
 	"os"
+
+	"github.com/cheggaaa/pb"
 )
 
 // Copy копирует исходный файл частично или полностью.

@@ -1,4 +1,4 @@
-package hw_10
+package copier
 
 import (
 	"io/ioutil"

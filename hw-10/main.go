@@ -2,9 +2,10 @@ package main
 
 import (
 	"flag"
-	"github.com/Temain/otus-golang/hw-10/copier"
 	"log"
 	"strings"
+
+	"github.com/Temain/otus-golang/hw-10/copier"
 )
 
 var (
@@ -31,7 +32,7 @@ func main() {
 		log.Fatal("empty -to arg, see --help")
 	}
 
-	err := hw_10.Copy(from, to, limit, offset)
+	err := copier.Copy(from, to, limit, offset)
 	if err != nil {
 		log.Fatal(err)
 	}
