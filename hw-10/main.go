@@ -31,7 +31,7 @@ func main() {
 		log.Fatal("empty -to arg, see --help")
 	}
 
-	err := copier.Copy(from, to, limit, offset)
+	err := hw_10.Copy(from, to, limit, offset)
 	if err != nil {
 		log.Fatal(err)
 	}
