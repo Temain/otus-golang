@@ -6,25 +6,30 @@ import (
 )
 
 func TestReadDir(t *testing.T) {
-	err := prepareFile("data/CITY", "Krasnodar")
+	dir := "data/"
+	envName1 := "CITY"
+	envValue1 := "Krasnodar"
+	err := prepareFile(dir+envName1, envValue1)
 	if err != nil {
 		t.Fatal("error on prepare env file")
 	}
-	err = prepareFile("data/USER_NAME", "Artem")
+	envName2 := "USER_NAME"
+	envValue2 := "Artem"
+	err = prepareFile(dir+envName2, envValue2)
 	if err != nil {
 		t.Fatal("error on prepare env file")
 	}
 
-	env, err := ReadDir("./data")
+	env, err := ReadDir(dir)
 	if err != nil {
 		t.Fatal("error on prepare env file")
 	}
 
-	if env["CITY"] == "" {
-		t.Fatal("bad result, expected CITY=Krasnodar")
+	if env[envName1] == "" {
+		t.Fatalf("bad result, expected %v=%v", envName1, envValue1)
 	}
-	if env["USER_NAME"] == "" {
-		t.Fatal("bad result, expected USER_NAME=Artem")
+	if env[envName2] == "" {
+		t.Fatalf("bad result, expected %v=%v", envName2, envValue2)
 	}
 }
 
