@@ -6,14 +6,23 @@ import (
 )
 
 // Run выполняет задачи, одновременно не более n, пока не будут выполнены все или не будет получено m ошибок.
-func Run(tasks []func() error, n int, m int) (err error, s int, e int) {
+func Run(tasks []func() error, n int, m int) (err error) {
+	if n < 0 || m < 0 {
+		return errors.New("n and m can't be negative")
+	}
+
 	guardCh := make(chan struct{}, n)
 	mu := sync.RWMutex{}
-	var wg sync.WaitGroup
+	var (
+		wg   sync.WaitGroup
+		s, e int
+		kill bool
+	)
+
 	for _, task := range tasks {
 		guardCh <- struct{}{}
-		err = checkErrors(&e, &m, &mu)
-		if err != nil {
+		if kill {
+			err = errors.New("too many errors")
 			break
 		}
 
@@ -24,30 +33,28 @@ func Run(tasks []func() error, n int, m int) (err error, s int, e int) {
 				<-guardCh
 			}()
 			err := task()
-			checkResults(&s, &e, &mu, err)
+			checkResults(&s, &e, &n, &m, &kill, &mu, err)
 		}(task)
 	}
 
 	close(guardCh)
 	wg.Wait()
 
-	return err, s, e
+	return err
 }
 
-func checkErrors(e *int, m *int, mu *sync.RWMutex) error {
-	mu.RLock()
-	defer mu.RUnlock()
-	if *e >= *m {
-		return errors.New("too many errors")
-	}
-	return nil
-}
-
-func checkResults(s *int, e *int, mu *sync.RWMutex, err error) {
+func checkResults(s *int, e *int, n *int, m *int, kill *bool, mu *sync.RWMutex, err error) {
 	mu.Lock()
 	defer mu.Unlock()
+
 	if err != nil {
 		*e++
+		if *e >= *m {
+			*kill = true
+		}
+		if *e > 0 && *e+*s > *n+*m {
+			*kill = true
+		}
 	} else {
 		*s++
 	}

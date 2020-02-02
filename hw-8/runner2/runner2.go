@@ -3,14 +3,18 @@ package runner2
 import (
 	"errors"
 	"fmt"
-	"time"
 )
 
 // Run выполняет задачи, одновременно не более n, пока не будут выполнены все или не будет получено m ошибок.
-func Run(tasks []func() error, n int, m int) (err error, s int, e int) {
-	queueCh := make(chan func() error)
+func Run(tasks []func() error, n int, m int) (err error) {
+	if n < 0 || m < 0 {
+		return errors.New("n and m can't be negative")
+	}
+
+	queueCh := make(chan func() error, len(tasks))
 	doneCh := make(chan bool)
 	killCh := make(chan bool)
+	var s, e int
 
 	// Запуск воркеров.
 	for i := 1; i <= n; i++ {
@@ -18,19 +22,25 @@ func Run(tasks []func() error, n int, m int) (err error, s int, e int) {
 	}
 
 	// Отправка задач в очередь к воркерам.
-	go func() {
-		for _, task := range tasks {
-			queueCh <- task
-		}
-	}()
+	for _, task := range tasks {
+		queueCh <- task
+	}
 
 	// Проверка результатов выполнения задач.
 	for range tasks {
 		done := <-doneCh
 		if !done {
 			e++
+			if e > m {
+				err = errors.New("errors limit exceed")
+				break
+			}
+
 			if e == m {
 				err = errors.New("too many errors")
+				if e+s > n+m {
+					err = errors.New("bad count of completed tasks")
+				}
 				break
 			}
 		}
@@ -39,9 +49,8 @@ func Run(tasks []func() error, n int, m int) (err error, s int, e int) {
 
 	// Завершение работы воркеров.
 	close(killCh)
-	time.Sleep(2 * time.Second)
 
-	return err, s, e
+	return err
 }
 
 func worker(num int, queueCh <-chan func() error, doneCh chan<- bool, killCh <-chan bool) {
