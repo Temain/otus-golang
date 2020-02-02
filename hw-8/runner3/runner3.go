@@ -12,7 +12,7 @@ func Run(tasks []func() error, n int, m int) (err error) {
 	}
 
 	guardCh := make(chan struct{}, n)
-	mu := sync.RWMutex{}
+	mu := sync.Mutex{}
 	var (
 		wg   sync.WaitGroup
 		s, e int
@@ -43,7 +43,7 @@ func Run(tasks []func() error, n int, m int) (err error) {
 	return err
 }
 
-func checkResults(s *int, e *int, n *int, m *int, kill *bool, mu *sync.RWMutex, err error) {
+func checkResults(s *int, e *int, n *int, m *int, kill *bool, mu *sync.Mutex, err error) {
 	mu.Lock()
 	defer mu.Unlock()
 

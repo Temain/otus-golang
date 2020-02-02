@@ -128,7 +128,7 @@ func TestTasksCountLessThenN(t *testing.T) {
 	n, m := 10, 2
 	err := Run(tasks, n, m)
 	if err != nil {
-		t.Fatalf("bad result expected error")
+		t.Fatalf("bad result, %v", err)
 	}
 }
 
@@ -137,6 +137,6 @@ func TestEmptyTasks(t *testing.T) {
 	n, m := 10, 10
 	err := Run(tasks, n, m)
 	if err != nil {
-		t.Fatalf("bad result expected error")
+		t.Fatalf("bad result, %v", err)
 	}
 }
