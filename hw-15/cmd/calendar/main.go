@@ -1,23 +1,17 @@
 package main
 
 import (
-	"context"
 	"net/http"
-	"os"
 	"time"
 
-	"github.com/heetch/confita"
-	"github.com/heetch/confita/backend/file"
-	"github.com/heetch/confita/backend/flags"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/pflag"
-	"github.com/temain/otus-golang/hw-15/configs"
-	c "github.com/temain/otus-golang/hw-15/pkg/calendar"
+	c "github.com/temain/otus-golang/hw-15/internal/calendar"
+	"github.com/temain/otus-golang/hw-15/pkg/configer"
+	"github.com/temain/otus-golang/hw-15/pkg/logger"
 )
 
 func main() {
-	cfg := readConfig()
-	configLogging(cfg)
+	cfg := configer.ReadConfig()
+	log := logger.NewLogger(cfg.LogFile, cfg.LogLevel)
 
 	calendar := c.NewCalendar()
 
@@ -39,47 +33,4 @@ func main() {
 	if err != nil {
 		log.Fatalf("http server error: %v", err)
 	}
-}
-
-func readConfig() *configs.Config {
-	var configPath string
-	pflag.StringVarP(&configPath, "config", "c", "configs/config.json", "Config file path")
-
-	loader := confita.NewLoader(
-		file.NewBackend(configPath),
-		flags.NewBackend(),
-	)
-	cfg := configs.Config{}
-	err := loader.Load(context.Background(), &cfg)
-	if err != nil {
-		log.Fatalf("read config error: %v", err)
-	}
-
-	return &cfg
-}
-
-func configLogging(cfg *configs.Config) {
-	f, err := os.OpenFile(cfg.LogFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-	log.SetOutput(f)
-
-	var level log.Level
-	switch cfg.LogLevel {
-	case "info":
-		level = log.InfoLevel
-		break
-	case "debug":
-		level = log.DebugLevel
-		break
-	case "warn":
-		level = log.WarnLevel
-		break
-	case "error":
-		level = log.ErrorLevel
-		break
-	}
-	log.SetLevel(level)
 }
