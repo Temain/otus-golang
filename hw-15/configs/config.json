@@ -1,5 +1,5 @@
 {
-  "http_listen": ":80",
-  "log_file": "config.json",
-  "log_level": "info"
+  "httpListen": ":80",
+  "logFile": "logs/log.txt",
+  "logLevel": "info"
 }
