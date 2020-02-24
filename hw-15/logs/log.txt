@@ -1,0 +1,3 @@
+time="2020-02-25T00:39:31+03:00" level=info msg=hello
+time="2020-02-25T00:39:42+03:00" level=info msg=hello
+time="2020-02-25T00:57:20+03:00" level=info msg=hello
