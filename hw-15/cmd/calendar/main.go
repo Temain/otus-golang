@@ -12,7 +12,6 @@ import (
 func main() {
 	cfg := configer.ReadConfig()
 	log := logger.NewLogger(cfg.LogFile, cfg.LogLevel)
-
 	calendar := c.NewCalendar()
 
 	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {

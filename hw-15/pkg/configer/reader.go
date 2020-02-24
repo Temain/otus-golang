@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/heetch/confita"
 	"github.com/heetch/confita/backend/file"
-	"github.com/heetch/confita/backend/flags"
 	"github.com/spf13/pflag"
 	"log"
 )
@@ -12,10 +11,10 @@ import (
 func ReadConfig() *Config {
 	var configPath string
 	pflag.StringVarP(&configPath, "config", "c", "configs/config.json", "Config file path")
+	pflag.Parse()
 
 	loader := confita.NewLoader(
 		file.NewBackend(configPath),
-		flags.NewBackend(),
 	)
 	cfg := Config{}
 	err := loader.Load(context.Background(), &cfg)
