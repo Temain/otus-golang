@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package calendar;
+
+message EventMessage {
+    int64 id = 1;
+    string title = 2;
+    string description = 3;
+    google.protobuf.Timestamp date = 4;
+}
+
+service EventService {
+    rpc sendMessage (EventMessage) returns (EventMessage);
+}
