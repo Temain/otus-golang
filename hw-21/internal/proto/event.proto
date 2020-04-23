@@ -3,7 +3,7 @@ option go_package = ".;proto";
 
 import "google/protobuf/timestamp.proto";
 
-package calendar;
+package proto;
 
 message EventMessage {
     int64 id = 1;

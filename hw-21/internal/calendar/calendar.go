@@ -31,14 +31,14 @@ func (c *MemoryCalendar) List() ([]Event, error) {
 	return list, nil
 }
 
-func (c *MemoryCalendar) Search(date time.Time) (*Event, error) {
+func (c *MemoryCalendar) Search(created time.Time) (*Event, error) {
 	for _, event := range c.events {
-		if event.Date == date {
+		if event.Created == created {
 			return event, nil
 		}
 	}
 
-	return nil, &ErrEventDateNotFound{date}
+	return nil, &ErrEventDateNotFound{created}
 }
 
 func (c *MemoryCalendar) Add(event *Event) error {
@@ -47,9 +47,9 @@ func (c *MemoryCalendar) Add(event *Event) error {
 		return &ErrEventAlreadyExists{event.Id}
 	}
 
-	found, _ = c.Search(event.Date)
+	found, _ = c.Search(event.Created)
 	if found != nil {
-		return &ErrDateBusy{event.Date}
+		return &ErrDateBusy{event.Created}
 	}
 
 	c.events[event.Id] = event
@@ -58,9 +58,9 @@ func (c *MemoryCalendar) Add(event *Event) error {
 }
 
 func (c *MemoryCalendar) Update(event *Event) error {
-	found, _ := c.Search(event.Date)
+	found, _ := c.Search(event.Created)
 	if found != nil {
-		return &ErrDateBusy{event.Date}
+		return &ErrDateBusy{event.Created}
 	}
 
 	current, ok := c.events[event.Id]
@@ -70,7 +70,7 @@ func (c *MemoryCalendar) Update(event *Event) error {
 
 	current.Title = event.Title
 	current.Description = event.Description
-	current.Date = event.Date
+	current.Created = event.Created
 
 	return nil
 }

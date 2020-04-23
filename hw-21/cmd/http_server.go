@@ -31,7 +31,7 @@ var HttpServerCmd = &cobra.Command{
 				Id:          1,
 				Title:       "Morning coffee",
 				Description: "The most important event of the day",
-				Date:        time.Now(),
+				Created:     time.Now(),
 			}
 			_ = calendar.Add(event)
 			log.Println("added new event")
