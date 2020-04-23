@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	event "github.com/Temain/otus-golang/hw-21/internal/calendar/proto"
+	event "github.com/Temain/otus-golang/hw-21/internal/proto"
 
 	"github.com/spf13/cobra"
 )

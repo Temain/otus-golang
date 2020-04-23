@@ -11,7 +11,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/status"
 
-	event "github.com/Temain/otus-golang/hw-21/internal/calendar/proto"
+	event "github.com/Temain/otus-golang/hw-21/internal/proto"
 	"google.golang.org/grpc"
 
 	"github.com/spf13/cobra"
