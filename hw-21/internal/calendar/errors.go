@@ -14,7 +14,7 @@ func (e *ErrDateBusy) Error() string {
 }
 
 type ErrEventNotFound struct {
-	Id int
+	Id int64
 }
 
 func (e *ErrEventNotFound) Error() string {
@@ -30,7 +30,7 @@ func (e *ErrEventDateNotFound) Error() string {
 }
 
 type ErrEventAlreadyExists struct {
-	Id int
+	Id int64
 }
 
 func (e *ErrEventAlreadyExists) Error() string {
@@ -38,7 +38,7 @@ func (e *ErrEventAlreadyExists) Error() string {
 }
 
 type ErrEventNotDeleted struct {
-	Id int
+	Id int64
 }
 
 func (e *ErrEventNotDeleted) Error() string {

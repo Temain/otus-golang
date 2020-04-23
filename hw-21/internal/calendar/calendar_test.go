@@ -11,7 +11,7 @@ func TestAddEvent(t *testing.T) {
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
-		Date:        time.Now(),
+		Created:     time.Now(),
 	}
 	err := c.Add(event)
 	if err != nil {
@@ -34,7 +34,7 @@ func TestAddDuplicateEvent(t *testing.T) {
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
-		Date:        time.Now(),
+		Created:     time.Now(),
 	}
 	err := c.Add(event)
 	if err != nil {
@@ -60,9 +60,9 @@ func TestList(t *testing.T) {
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
-		Date:        time.Now(),
+		Created:     time.Now(),
 	}
-	c = CreateCalendar(map[int]*Event{1: event})
+	c = CreateCalendar(map[int64]*Event{1: event})
 	events, err = c.List()
 	if err != nil {
 		t.Fatal(err)
@@ -73,37 +73,37 @@ func TestList(t *testing.T) {
 }
 
 func TestSearchEvent(t *testing.T) {
-	date := time.Now()
+	created := time.Now()
 	event := &Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
-		Date:        date,
+		Created:     created,
 	}
-	c := CreateCalendar(map[int]*Event{1: event})
-	found, _ := c.Search(date)
+	c := CreateCalendar(map[int64]*Event{1: event})
+	found, _ := c.Search(created)
 	if found == nil {
 		t.Fatalf("bad search result, event not found")
 	}
-	if found.Date != date {
-		t.Fatalf("bad search result, expected event date %v", date)
+	if found.Created != created {
+		t.Fatalf("bad search result, expected event date %v", created)
 	}
 }
 
 func TestUpdateEvent(t *testing.T) {
-	date := time.Now()
+	created := time.Now()
 	event := &Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
-		Date:        date,
+		Created:     created,
 	}
-	c := CreateCalendar(map[int]*Event{1: event})
+	c := CreateCalendar(map[int64]*Event{1: event})
 	eventNew := &Event{
 		Id:          1,
 		Title:       "Evening tea",
 		Description: "Not bad",
-		Date:        date.Add(time.Second),
+		Created:     created.Add(time.Second),
 	}
 	err := c.Update(eventNew)
 	if err != nil {
@@ -115,25 +115,25 @@ func TestUpdateEvent(t *testing.T) {
 	}
 	updated := events[0]
 	if updated.Title != eventNew.Title {
-		t.Fatalf("bad update result, expected event title %v", date)
+		t.Fatalf("bad update result, expected event title %v", created)
 	}
 	if updated.Description != eventNew.Description {
-		t.Fatalf("bad update result, expected event description %v", date)
+		t.Fatalf("bad update result, expected event description %v", created)
 	}
-	if updated.Date != eventNew.Date {
-		t.Fatalf("bad update result, expected event date %v", date)
+	if updated.Created != eventNew.Created {
+		t.Fatalf("bad update result, expected event date %v", created)
 	}
 }
 
 func TestDeleteEvent(t *testing.T) {
-	date := time.Now()
+	created := time.Now()
 	event := &Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
-		Date:        date,
+		Created:     created,
 	}
-	c := CreateCalendar(map[int]*Event{1: event})
+	c := CreateCalendar(map[int64]*Event{1: event})
 	events, _ := c.List()
 	if len(events) == 0 {
 		t.Fatalf("bad result, prepared caledar is empty")

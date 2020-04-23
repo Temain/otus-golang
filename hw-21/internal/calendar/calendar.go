@@ -9,17 +9,17 @@ type Calendar interface {
 	Search(date time.Time) (*Event, error)
 	Add(*Event) error
 	Update(*Event) error
-	Delete(int) error
+	Delete(int64) error
 }
 
 type MemoryCalendar struct {
-	events map[int]*Event
+	events map[int64]*Event
 }
 
 func NewCalendar() Calendar {
-	return &MemoryCalendar{events: map[int]*Event{}}
+	return &MemoryCalendar{events: map[int64]*Event{}}
 }
-func CreateCalendar(events map[int]*Event) Calendar {
+func CreateCalendar(events map[int64]*Event) Calendar {
 	return &MemoryCalendar{events: events}
 }
 
@@ -75,9 +75,14 @@ func (c *MemoryCalendar) Update(event *Event) error {
 	return nil
 }
 
-func (c *MemoryCalendar) Delete(eventId int) error {
-	delete(c.events, eventId)
+func (c *MemoryCalendar) Delete(eventId int64) error {
 	_, exists := c.events[eventId]
+	if !exists {
+		return &ErrEventNotFound{eventId}
+	}
+
+	delete(c.events, eventId)
+	_, exists = c.events[eventId]
 	if exists {
 		return &ErrEventNotDeleted{eventId}
 	}
