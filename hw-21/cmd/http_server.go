@@ -6,6 +6,8 @@ import (
 	"time"
 
 	c "github.com/Temain/otus-golang/hw-21/internal/calendar"
+
+	e "github.com/Temain/otus-golang/hw-21/internal/calendar/entities"
 	"github.com/Temain/otus-golang/hw-21/internal/configer"
 	"github.com/Temain/otus-golang/hw-21/internal/logger"
 
@@ -27,7 +29,7 @@ var HttpServerCmd = &cobra.Command{
 		})
 
 		http.HandleFunc("/add", func(w http.ResponseWriter, r *http.Request) {
-			event := &c.Event{
+			event := &e.Event{
 				Id:          1,
 				Title:       "Morning coffee",
 				Description: "The most important event of the day",

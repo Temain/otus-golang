@@ -1,4 +1,4 @@
-package calendar
+package entities
 
 import (
 	"fmt"
@@ -6,11 +6,11 @@ import (
 )
 
 type ErrDateBusy struct {
-	date time.Time
+	Date time.Time
 }
 
 func (e *ErrDateBusy) Error() string {
-	return fmt.Sprintf("date %v already busy", e.date)
+	return fmt.Sprintf("date %v already busy", e.Date)
 }
 
 type ErrEventNotFound struct {

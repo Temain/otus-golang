@@ -8,6 +8,8 @@ import (
 	"net"
 	"time"
 
+	c "github.com/Temain/otus-golang/hw-21/internal/calendar"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -16,7 +18,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	c "github.com/Temain/otus-golang/hw-21/internal/calendar"
+	e "github.com/Temain/otus-golang/hw-21/internal/calendar/entities"
+	i "github.com/Temain/otus-golang/hw-21/internal/calendar/interfaces"
 	p "github.com/Temain/otus-golang/hw-21/internal/proto"
 
 	"github.com/spf13/cobra"
@@ -25,7 +28,7 @@ import (
 var index int64 = 1
 
 type EventServer struct {
-	Calendar c.Calendar
+	Calendar i.Calendar
 }
 
 func (s EventServer) List(request *p.ListRequest, stream p.EventService_ListServer) error {
@@ -127,7 +130,7 @@ var GrpcServerCmd = &cobra.Command{
 
 		// calendar with some events
 		calendar := c.NewCalendar()
-		event1 := &c.Event{
+		event1 := &e.Event{
 			Id:          index,
 			Title:       "Morning coffee",
 			Description: "The most important event of the day",
@@ -136,7 +139,7 @@ var GrpcServerCmd = &cobra.Command{
 		_ = calendar.Add(event1)
 		index++
 
-		event2 := &c.Event{
+		event2 := &e.Event{
 			Id:          index,
 			Title:       "Evening tea",
 			Description: "Not bad",
@@ -152,7 +155,7 @@ var GrpcServerCmd = &cobra.Command{
 	},
 }
 
-func mapEventToMessage(event c.Event) (*p.EventMessage, error) {
+func mapEventToMessage(event e.Event) (*p.EventMessage, error) {
 	timestamp, err := ptypes.TimestampProto(event.Created)
 	if err != nil {
 		return nil, errors.New("wrong event time")
@@ -166,13 +169,13 @@ func mapEventToMessage(event c.Event) (*p.EventMessage, error) {
 	return msg, nil
 }
 
-func mapMessageToEvent(msg p.EventMessage) (*c.Event, error) {
+func mapMessageToEvent(msg p.EventMessage) (*e.Event, error) {
 	created, err := ptypes.Timestamp(msg.Created)
 	if err != nil {
 		return nil, errors.New("wrong event time in message")
 	}
 
-	event := &c.Event{
+	event := &e.Event{
 		Id:          msg.Id,
 		Title:       msg.Title,
 		Description: msg.Description,

@@ -3,11 +3,13 @@ package calendar
 import (
 	"testing"
 	"time"
+
+	e "github.com/Temain/otus-golang/hw-21/internal/calendar/entities"
 )
 
 func TestAddEvent(t *testing.T) {
 	c := NewCalendar()
-	event := &Event{
+	event := &e.Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
@@ -30,7 +32,7 @@ func TestAddEvent(t *testing.T) {
 
 func TestAddDuplicateEvent(t *testing.T) {
 	c := NewCalendar()
-	event := &Event{
+	event := &e.Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
@@ -56,13 +58,13 @@ func TestList(t *testing.T) {
 		t.Fatal("bad result of list, should be empty list")
 	}
 
-	event := &Event{
+	event := &e.Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
 		Created:     time.Now(),
 	}
-	c = CreateCalendar(map[int64]*Event{1: event})
+	c = CreateCalendar(map[int64]*e.Event{1: event})
 	events, err = c.List()
 	if err != nil {
 		t.Fatal(err)
@@ -74,13 +76,13 @@ func TestList(t *testing.T) {
 
 func TestSearchEvent(t *testing.T) {
 	created := time.Now()
-	event := &Event{
+	event := &e.Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
 		Created:     created,
 	}
-	c := CreateCalendar(map[int64]*Event{1: event})
+	c := CreateCalendar(map[int64]*e.Event{1: event})
 	found, _ := c.Search(created)
 	if found == nil {
 		t.Fatalf("bad search result, event not found")
@@ -92,14 +94,14 @@ func TestSearchEvent(t *testing.T) {
 
 func TestUpdateEvent(t *testing.T) {
 	created := time.Now()
-	event := &Event{
+	event := &e.Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
 		Created:     created,
 	}
-	c := CreateCalendar(map[int64]*Event{1: event})
-	eventNew := &Event{
+	c := CreateCalendar(map[int64]*e.Event{1: event})
+	eventNew := &e.Event{
 		Id:          1,
 		Title:       "Evening tea",
 		Description: "Not bad",
@@ -127,13 +129,13 @@ func TestUpdateEvent(t *testing.T) {
 
 func TestDeleteEvent(t *testing.T) {
 	created := time.Now()
-	event := &Event{
+	event := &e.Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
 		Created:     created,
 	}
-	c := CreateCalendar(map[int64]*Event{1: event})
+	c := CreateCalendar(map[int64]*e.Event{1: event})
 	events, _ := c.List()
 	if len(events) == 0 {
 		t.Fatalf("bad result, prepared caledar is empty")
