@@ -8,8 +8,11 @@ import (
 	"net"
 	"time"
 
-	c "github.com/Temain/otus-golang/hw-21/internal/calendar"
+	"github.com/sirupsen/logrus"
 
+	c "github.com/Temain/otus-golang/hw-21/internal/calendar"
+	"github.com/Temain/otus-golang/hw-21/internal/configer"
+	"github.com/Temain/otus-golang/hw-21/internal/logger"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -25,6 +28,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var logr *logrus.Logger
 var index int64 = 1
 
 type EventServer struct {
@@ -32,6 +36,7 @@ type EventServer struct {
 }
 
 func (s EventServer) List(request *p.ListRequest, stream p.EventService_ListServer) error {
+	logr.Info("received list request")
 	events, err := s.Calendar.List()
 	if err != nil {
 		return status.Error(codes.Internal, "error on list events")
@@ -51,6 +56,7 @@ func (s EventServer) List(request *p.ListRequest, stream p.EventService_ListServ
 }
 
 func (s EventServer) Search(context context.Context, request *p.SearchRequest) (*p.SearchResponse, error) {
+	logr.Info("received search request")
 	response := &p.SearchResponse{}
 	created, err := ptypes.Timestamp(request.Date)
 	if err != nil {
@@ -70,6 +76,7 @@ func (s EventServer) Search(context context.Context, request *p.SearchRequest) (
 }
 
 func (s EventServer) Add(context context.Context, request *p.AddRequest) (*p.AddResponse, error) {
+	logr.Info("received add request")
 	defer func() { index++ }()
 	response := &p.AddResponse{}
 	event, err := mapMessageToEvent(*request.Event)
@@ -88,6 +95,7 @@ func (s EventServer) Add(context context.Context, request *p.AddRequest) (*p.Add
 }
 
 func (s EventServer) Update(context context.Context, request *p.UpdateRequest) (*p.UpdateResponse, error) {
+	logr.Info("received update request")
 	response := &p.UpdateResponse{}
 	event, err := mapMessageToEvent(*request.Event)
 	if err != nil {
@@ -104,6 +112,7 @@ func (s EventServer) Update(context context.Context, request *p.UpdateRequest) (
 }
 
 func (s EventServer) Delete(context context.Context, request *p.DeleteRequest) (*p.DeleteResponse, error) {
+	logr.Info("received delete request")
 	response := &p.DeleteResponse{}
 	err := s.Calendar.Delete(request.Id)
 	if err != nil {
@@ -120,7 +129,10 @@ var GrpcServerCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("running gRPC server...")
 
-		listen, err := net.Listen("tcp", "0.0.0.0:50051")
+		cfg := configer.ReadConfig()
+		logr = logger.NewLogger(cfg.LogFile, cfg.LogLevel)
+		addr := fmt.Sprintf("0.0.0.0%s", cfg.GrpcListen)
+		listen, err := net.Listen("tcp", addr)
 		if err != nil {
 			log.Fatalf("failed to listen %v", err)
 		}

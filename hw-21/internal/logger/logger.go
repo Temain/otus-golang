@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"io"
 	"os"
 
 	"github.com/sirupsen/logrus"
@@ -12,7 +13,8 @@ func NewLogger(logFile string, level string) *logrus.Logger {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	logger.SetOutput(f)
+	mw := io.MultiWriter(os.Stdout, f)
+	logrus.SetOutput(mw)
 
 	var loggerLevel logrus.Level
 	switch level {

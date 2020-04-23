@@ -1,6 +1,5 @@
-time="2020-02-25T00:39:31+03:00" level=info msg=hello
-time="2020-02-25T00:39:42+03:00" level=info msg=hello
-time="2020-02-25T00:57:20+03:00" level=info msg=hello
-time="2020-02-25T01:19:40+03:00" level=info msg=hello
-time="2020-02-25T01:20:34+03:00" level=info msg=hello
-time="2020-02-25T01:21:33+03:00" level=info msg=hello
+time="2020-04-23T19:42:35+03:00" level=info msg="received list request"
+time="2020-04-23T19:42:42+03:00" level=info msg="received search request"
+time="2020-04-23T19:42:47+03:00" level=info msg="received add request"
+time="2020-04-23T19:42:57+03:00" level=info msg="received update request"
+time="2020-04-23T19:43:04+03:00" level=info msg="received delete request"
