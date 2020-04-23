@@ -6,7 +6,6 @@ import (
 	"time"
 
 	c "github.com/Temain/otus-golang/hw-21/internal/calendar"
-
 	e "github.com/Temain/otus-golang/hw-21/internal/calendar/entities"
 	"github.com/Temain/otus-golang/hw-21/internal/configer"
 	"github.com/Temain/otus-golang/hw-21/internal/logger"
@@ -22,7 +21,7 @@ var HttpServerCmd = &cobra.Command{
 
 		cfg := configer.ReadConfig()
 		log := logger.NewLogger(cfg.LogFile, cfg.LogLevel)
-		calendar := c.NewCalendar()
+		calendar := c.NewMemoryCalendar()
 
 		http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
 			log.Println("hello")

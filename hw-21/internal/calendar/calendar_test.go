@@ -8,7 +8,7 @@ import (
 )
 
 func TestAddEvent(t *testing.T) {
-	c := NewCalendar()
+	c := NewMemoryCalendar()
 	event := &e.Event{
 		Id:          1,
 		Title:       "Morning coffee",
@@ -31,7 +31,7 @@ func TestAddEvent(t *testing.T) {
 }
 
 func TestAddDuplicateEvent(t *testing.T) {
-	c := NewCalendar()
+	c := NewMemoryCalendar()
 	event := &e.Event{
 		Id:          1,
 		Title:       "Morning coffee",
@@ -49,7 +49,7 @@ func TestAddDuplicateEvent(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
-	c := NewCalendar()
+	c := NewMemoryCalendar()
 	events, err := c.List()
 	if err != nil {
 		t.Fatal(err)
@@ -64,7 +64,8 @@ func TestList(t *testing.T) {
 		Description: "The most important event of the day",
 		Created:     time.Now(),
 	}
-	c = CreateCalendar(map[int64]*e.Event{1: event})
+	s := CreateMemoryStorage(map[int64]*e.Event{1: event})
+	c = CreateCalendar(s)
 	events, err = c.List()
 	if err != nil {
 		t.Fatal(err)
@@ -82,7 +83,8 @@ func TestSearchEvent(t *testing.T) {
 		Description: "The most important event of the day",
 		Created:     created,
 	}
-	c := CreateCalendar(map[int64]*e.Event{1: event})
+	s := CreateMemoryStorage(map[int64]*e.Event{1: event})
+	c := CreateCalendar(s)
 	found, _ := c.Search(created)
 	if found == nil {
 		t.Fatalf("bad search result, event not found")
@@ -100,7 +102,8 @@ func TestUpdateEvent(t *testing.T) {
 		Description: "The most important event of the day",
 		Created:     created,
 	}
-	c := CreateCalendar(map[int64]*e.Event{1: event})
+	s := CreateMemoryStorage(map[int64]*e.Event{1: event})
+	c := CreateCalendar(s)
 	eventNew := &e.Event{
 		Id:          1,
 		Title:       "Evening tea",
@@ -135,7 +138,8 @@ func TestDeleteEvent(t *testing.T) {
 		Description: "The most important event of the day",
 		Created:     created,
 	}
-	c := CreateCalendar(map[int64]*e.Event{1: event})
+	s := CreateMemoryStorage(map[int64]*e.Event{1: event})
+	c := CreateCalendar(s)
 	events, _ := c.List()
 	if len(events) == 0 {
 		t.Fatalf("bad result, prepared caledar is empty")

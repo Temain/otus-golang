@@ -28,7 +28,7 @@ import (
 var index int64 = 1
 
 type EventServer struct {
-	Calendar i.Calendar
+	Calendar i.ICalendar
 }
 
 func (s EventServer) List(request *p.ListRequest, stream p.EventService_ListServer) error {
@@ -129,7 +129,7 @@ var GrpcServerCmd = &cobra.Command{
 		reflection.Register(grpcServer)
 
 		// calendar with some events
-		calendar := c.NewCalendar()
+		calendar := c.NewMemoryCalendar()
 		event1 := &e.Event{
 			Id:          index,
 			Title:       "Morning coffee",
