@@ -1,0 +1,6 @@
+{
+  "httpListen": ":80",
+  "grpcListen": ":50051",
+  "logFile": "logs/log.txt",
+  "logLevel": "info"
+}
