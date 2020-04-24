@@ -18,4 +18,4 @@ SQL миграция должна применять с первого раза 
 Бизнес логика (пакет internal/domain в примере) должна использовать модуль для работы с СУБД через интерефейсы  
 Код должен работать проходить проверки go vet и golint
 
-docker run --name some-postgres -e POSTGRES_PASSWORD=mysecretpassword -d postgres
+docker run --name some-postgres -p 5432:5432 -e POSTGRES_PASSWORD=mysecretpassword -d postgres

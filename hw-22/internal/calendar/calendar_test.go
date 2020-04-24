@@ -1,13 +1,16 @@
 package calendar
 
 import (
+	"context"
 	"testing"
 	"time"
 
 	e "github.com/Temain/otus-golang/hw-22/internal/calendar/entities"
+	s "github.com/Temain/otus-golang/hw-22/internal/calendar/storages"
 )
 
 func TestAddEvent(t *testing.T) {
+	ctx := context.Background()
 	c := NewMemoryCalendar()
 	event := &e.Event{
 		Id:          1,
@@ -15,12 +18,12 @@ func TestAddEvent(t *testing.T) {
 		Description: "The most important event of the day",
 		Created:     time.Now(),
 	}
-	err := c.Add(event)
+	err := c.Add(ctx, event)
 	if err != nil {
 		t.Fatalf("bad result on add event, %v", err)
 	}
 
-	events, err := c.List()
+	events, err := c.List(ctx)
 	if err != nil {
 		t.Fatalf("bad result on list events, %v", err)
 	}
@@ -31,6 +34,7 @@ func TestAddEvent(t *testing.T) {
 }
 
 func TestAddDuplicateEvent(t *testing.T) {
+	ctx := context.Background()
 	c := NewMemoryCalendar()
 	event := &e.Event{
 		Id:          1,
@@ -38,19 +42,20 @@ func TestAddDuplicateEvent(t *testing.T) {
 		Description: "The most important event of the day",
 		Created:     time.Now(),
 	}
-	err := c.Add(event)
+	err := c.Add(ctx, event)
 	if err != nil {
 		t.Fatalf("bad result on add event, %v", err)
 	}
-	err = c.Add(event)
+	err = c.Add(ctx, event)
 	if err == nil {
 		t.Fatalf("bad result on second add event, should be error")
 	}
 }
 
 func TestList(t *testing.T) {
+	ctx := context.Background()
 	c := NewMemoryCalendar()
-	events, err := c.List()
+	events, err := c.List(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -64,9 +69,9 @@ func TestList(t *testing.T) {
 		Description: "The most important event of the day",
 		Created:     time.Now(),
 	}
-	s := CreateMemoryStorage(map[int64]*e.Event{1: event})
+	s := s.CreateMemoryStorage(map[int64]*e.Event{1: event})
 	c = CreateCalendar(s)
-	events, err = c.List()
+	events, err = c.List(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -76,6 +81,7 @@ func TestList(t *testing.T) {
 }
 
 func TestSearchEvent(t *testing.T) {
+	ctx := context.Background()
 	created := time.Now()
 	event := &e.Event{
 		Id:          1,
@@ -83,9 +89,9 @@ func TestSearchEvent(t *testing.T) {
 		Description: "The most important event of the day",
 		Created:     created,
 	}
-	s := CreateMemoryStorage(map[int64]*e.Event{1: event})
+	s := s.CreateMemoryStorage(map[int64]*e.Event{1: event})
 	c := CreateCalendar(s)
-	found, _ := c.Search(created)
+	found, _ := c.Search(ctx, created)
 	if found == nil {
 		t.Fatalf("bad search result, event not found")
 	}
@@ -95,6 +101,7 @@ func TestSearchEvent(t *testing.T) {
 }
 
 func TestUpdateEvent(t *testing.T) {
+	ctx := context.Background()
 	created := time.Now()
 	event := &e.Event{
 		Id:          1,
@@ -102,7 +109,7 @@ func TestUpdateEvent(t *testing.T) {
 		Description: "The most important event of the day",
 		Created:     created,
 	}
-	s := CreateMemoryStorage(map[int64]*e.Event{1: event})
+	s := s.CreateMemoryStorage(map[int64]*e.Event{1: event})
 	c := CreateCalendar(s)
 	eventNew := &e.Event{
 		Id:          1,
@@ -110,11 +117,11 @@ func TestUpdateEvent(t *testing.T) {
 		Description: "Not bad",
 		Created:     created.Add(time.Second),
 	}
-	err := c.Update(eventNew)
+	err := c.Update(ctx, eventNew)
 	if err != nil {
 		t.Fatalf("bad update result, %v", err)
 	}
-	events, _ := c.List()
+	events, _ := c.List(ctx)
 	if len(events) == 0 {
 
 	}
@@ -131,6 +138,7 @@ func TestUpdateEvent(t *testing.T) {
 }
 
 func TestDeleteEvent(t *testing.T) {
+	ctx := context.Background()
 	created := time.Now()
 	event := &e.Event{
 		Id:          1,
@@ -138,14 +146,14 @@ func TestDeleteEvent(t *testing.T) {
 		Description: "The most important event of the day",
 		Created:     created,
 	}
-	s := CreateMemoryStorage(map[int64]*e.Event{1: event})
+	s := s.CreateMemoryStorage(map[int64]*e.Event{1: event})
 	c := CreateCalendar(s)
-	events, _ := c.List()
+	events, _ := c.List(ctx)
 	if len(events) == 0 {
 		t.Fatalf("bad result, prepared caledar is empty")
 	}
 
-	err := c.Delete(event.Id)
+	err := c.Delete(ctx, event.Id)
 	if err != nil {
 		t.Fatalf("bad delete result, %v", err)
 	}
