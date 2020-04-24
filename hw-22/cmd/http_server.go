@@ -34,7 +34,7 @@ var HttpServerCmd = &cobra.Command{
 				Description: "The most important event of the day",
 				Created:     time.Now(),
 			}
-			_ = calendar.Add(event)
+			_ = calendar.Add(r.Context(), event)
 			log.Println("added new event")
 		})
 		err := http.ListenAndServe(cfg.HttpListen, nil)

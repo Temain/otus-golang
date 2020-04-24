@@ -1,10 +1,12 @@
 package calendar
 
 import (
+	"context"
 	"time"
 
 	e "github.com/Temain/otus-golang/hw-22/internal/calendar/entities"
 	i "github.com/Temain/otus-golang/hw-22/internal/calendar/interfaces"
+	s "github.com/Temain/otus-golang/hw-22/internal/calendar/storages"
 )
 
 type Calendar struct {
@@ -12,23 +14,30 @@ type Calendar struct {
 }
 
 func NewMemoryCalendar() i.ICalendar {
-	storage := NewMemoryStorage()
+	storage := s.NewMemoryStorage()
 	return &Calendar{storage}
+}
+func NewPostgreCalendar(dsn string) (i.ICalendar, error) {
+	storage, err := s.NewPostgreStorage(dsn)
+	if err != nil {
+		return nil, err
+	}
+	return &Calendar{storage}, nil
 }
 func CreateCalendar(storage i.ICalendarStorage) i.ICalendar {
 	return &Calendar{storage}
 }
 
-func (c *Calendar) List() ([]e.Event, error) {
-	list, err := c.storage.List()
+func (c *Calendar) List(ctx context.Context) ([]e.Event, error) {
+	list, err := c.storage.List(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return list, nil
 }
 
-func (c *Calendar) Search(created time.Time) (*e.Event, error) {
-	found, err := c.storage.Search(created)
+func (c *Calendar) Search(ctx context.Context, created time.Time) (*e.Event, error) {
+	found, err := c.storage.Search(ctx, created)
 	if err != nil {
 		return nil, err
 	}
@@ -40,18 +49,18 @@ func (c *Calendar) Search(created time.Time) (*e.Event, error) {
 	return found, nil
 }
 
-func (c *Calendar) Add(event *e.Event) error {
-	found, _ := c.storage.Get(event.Id)
+func (c *Calendar) Add(ctx context.Context, event *e.Event) error {
+	found, _ := c.storage.Get(ctx, event.Id)
 	if found != nil {
 		return &e.ErrEventAlreadyExists{Id: event.Id}
 	}
 
-	found, _ = c.storage.Search(event.Created)
+	found, _ = c.storage.Search(ctx, event.Created)
 	if found != nil {
 		return &e.ErrDateBusy{Date: event.Created}
 	}
 
-	err := c.storage.Add(event)
+	err := c.storage.Add(ctx, event)
 	if err != nil {
 		return err
 	}
@@ -59,18 +68,18 @@ func (c *Calendar) Add(event *e.Event) error {
 	return nil
 }
 
-func (c *Calendar) Update(event *e.Event) error {
-	found, _ := c.storage.Search(event.Created)
+func (c *Calendar) Update(ctx context.Context, event *e.Event) error {
+	found, _ := c.storage.Search(ctx, event.Created)
 	if found != nil {
 		return &e.ErrDateBusy{Date: event.Created}
 	}
 
-	current, _ := c.storage.Get(event.Id)
+	current, _ := c.storage.Get(ctx, event.Id)
 	if current == nil {
 		return &e.ErrEventNotFound{Id: event.Id}
 	}
 
-	err := c.storage.Update(event)
+	err := c.storage.Update(ctx, event)
 	if err != nil {
 		return err
 	}
@@ -78,13 +87,13 @@ func (c *Calendar) Update(event *e.Event) error {
 	return nil
 }
 
-func (c *Calendar) Delete(eventId int64) error {
-	event, _ := c.storage.Get(eventId)
+func (c *Calendar) Delete(ctx context.Context, eventId int64) error {
+	event, _ := c.storage.Get(ctx, eventId)
 	if event == nil {
 		return &e.ErrEventNotFound{Id: eventId}
 	}
 
-	err := c.storage.Delete(eventId)
+	err := c.storage.Delete(ctx, eventId)
 	if err != nil {
 		return err
 	}

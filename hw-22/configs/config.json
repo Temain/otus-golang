@@ -2,5 +2,6 @@
   "httpListen": ":80",
   "grpcListen": ":50051",
   "logFile": "logs/log.txt",
-  "logLevel": "info"
+  "logLevel": "info",
+  "postgreDSN": "postgres://postgres:123456789@localhost:5432/calendar"
 }

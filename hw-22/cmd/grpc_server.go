@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"time"
 
 	"github.com/sirupsen/logrus"
 
@@ -37,8 +36,9 @@ type EventServer struct {
 
 func (s EventServer) List(request *p.ListRequest, stream p.EventService_ListServer) error {
 	logr.Info("received list request")
-	events, err := s.Calendar.List()
+	events, err := s.Calendar.List(context.Background())
 	if err != nil {
+		log.Printf("error on list events: %v", err)
 		return status.Error(codes.Internal, "error on list events")
 	}
 
@@ -55,14 +55,14 @@ func (s EventServer) List(request *p.ListRequest, stream p.EventService_ListServ
 	return nil
 }
 
-func (s EventServer) Search(context context.Context, request *p.SearchRequest) (*p.SearchResponse, error) {
+func (s EventServer) Search(ctx context.Context, request *p.SearchRequest) (*p.SearchResponse, error) {
 	logr.Info("received search request")
 	response := &p.SearchResponse{}
 	created, err := ptypes.Timestamp(request.Date)
 	if err != nil {
 		return response, status.Error(codes.InvalidArgument, "wrong search date")
 	}
-	event, _ := s.Calendar.Search(created)
+	event, _ := s.Calendar.Search(ctx, created)
 	if event == nil {
 		return response, nil
 	}
@@ -75,7 +75,7 @@ func (s EventServer) Search(context context.Context, request *p.SearchRequest) (
 	return response, nil
 }
 
-func (s EventServer) Add(context context.Context, request *p.AddRequest) (*p.AddResponse, error) {
+func (s EventServer) Add(ctx context.Context, request *p.AddRequest) (*p.AddResponse, error) {
 	logr.Info("received add request")
 	defer func() { index++ }()
 	response := &p.AddResponse{}
@@ -85,7 +85,7 @@ func (s EventServer) Add(context context.Context, request *p.AddRequest) (*p.Add
 	}
 
 	event.Id = index
-	err = s.Calendar.Add(event)
+	err = s.Calendar.Add(ctx, event)
 	if err != nil {
 		return response, status.Error(codes.Internal, fmt.Sprintf("error on add new event: %v", err))
 	}
@@ -94,7 +94,7 @@ func (s EventServer) Add(context context.Context, request *p.AddRequest) (*p.Add
 	return response, nil
 }
 
-func (s EventServer) Update(context context.Context, request *p.UpdateRequest) (*p.UpdateResponse, error) {
+func (s EventServer) Update(ctx context.Context, request *p.UpdateRequest) (*p.UpdateResponse, error) {
 	logr.Info("received update request")
 	response := &p.UpdateResponse{}
 	event, err := mapMessageToEvent(*request.Event)
@@ -102,7 +102,7 @@ func (s EventServer) Update(context context.Context, request *p.UpdateRequest) (
 		return response, status.Error(codes.Internal, "error on map message to event")
 	}
 
-	err = s.Calendar.Update(event)
+	err = s.Calendar.Update(ctx, event)
 	if err != nil {
 		return response, status.Error(codes.Internal, fmt.Sprintf("error on update event: %v", err))
 	}
@@ -111,10 +111,10 @@ func (s EventServer) Update(context context.Context, request *p.UpdateRequest) (
 	return response, nil
 }
 
-func (s EventServer) Delete(context context.Context, request *p.DeleteRequest) (*p.DeleteResponse, error) {
+func (s EventServer) Delete(ctx context.Context, request *p.DeleteRequest) (*p.DeleteResponse, error) {
 	logr.Info("received delete request")
 	response := &p.DeleteResponse{}
-	err := s.Calendar.Delete(request.Id)
+	err := s.Calendar.Delete(ctx, request.Id)
 	if err != nil {
 		return response, status.Error(codes.Internal, fmt.Sprintf("error on delete event: %v", err))
 	}
@@ -127,7 +127,7 @@ var GrpcServerCmd = &cobra.Command{
 	Use:   "grpc_server",
 	Short: "run grpc server",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("running gRPC server...")
+		log.Println("running gRPC server...")
 
 		cfg := configer.ReadConfig()
 		logr = logger.NewLogger(cfg.LogFile, cfg.LogLevel)
@@ -140,28 +140,13 @@ var GrpcServerCmd = &cobra.Command{
 		grpcServer := grpc.NewServer()
 		reflection.Register(grpcServer)
 
-		// calendar with some events
-		calendar := c.NewMemoryCalendar()
-		event1 := &e.Event{
-			Id:          index,
-			Title:       "Morning coffee",
-			Description: "The most important event of the day",
-			Created:     time.Date(2020, 04, 22, 10, 00, 00, 00, time.UTC),
+		calendar, err := c.NewPostgreCalendar(cfg.PostgreDSN)
+		if err != nil {
+			log.Fatalf("unable to connect to database: %v", err)
 		}
-		_ = calendar.Add(event1)
-		index++
-
-		event2 := &e.Event{
-			Id:          index,
-			Title:       "Evening tea",
-			Description: "Not bad",
-			Created:     time.Date(2020, 04, 22, 22, 00, 00, 00, time.UTC),
-		}
-		_ = calendar.Add(event2)
-		index++
+		log.Println("connected to database")
 
 		eventServer := &EventServer{Calendar: calendar}
-
 		p.RegisterEventServiceServer(grpcServer, eventServer)
 		_ = grpcServer.Serve(listen)
 	},
