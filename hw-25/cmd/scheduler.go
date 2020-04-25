@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/Temain/otus-golang/hw-25/internal/rabbitmq"
-
 	"log"
 	"time"
 
@@ -17,6 +15,7 @@ import (
 	"github.com/Temain/otus-golang/hw-25/internal/domain/entities"
 	interfaces "github.com/Temain/otus-golang/hw-25/internal/domain/interfaces"
 	"github.com/Temain/otus-golang/hw-25/internal/domain/storages"
+	"github.com/Temain/otus-golang/hw-25/internal/rabbitmq"
 )
 
 var SchedulerCmd = &cobra.Command{

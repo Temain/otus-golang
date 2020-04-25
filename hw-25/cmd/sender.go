@@ -7,9 +7,8 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/Temain/otus-golang/hw-25/internal/rabbitmq"
-
 	"github.com/Temain/otus-golang/hw-25/internal/configer"
+	"github.com/Temain/otus-golang/hw-25/internal/rabbitmq"
 	"github.com/spf13/cobra"
 
 	"github.com/streadway/amqp"
