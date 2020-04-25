@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/Temain/otus-golang/hw-25/internal/rabbitmq"
+
 	"log"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/cobra"
-	"github.com/streadway/amqp"
 
 	"github.com/Temain/otus-golang/hw-25/internal/configer"
 	"github.com/Temain/otus-golang/hw-25/internal/domain/entities"
@@ -25,64 +26,43 @@ var SchedulerCmd = &cobra.Command{
 		log.Println("running scheduler...")
 
 		cfg := configer.ReadConfig()
-		conn, err := amqp.Dial(cfg.RabbitUrl)
-		failOnError(err, "failed to connect to RabbitMQ")
-		defer conn.Close()
-
-		channel, err := conn.Channel()
-		failOnError(err, "failed to open a channel")
-		defer channel.Close()
-
-		queue, err := channel.QueueDeclare(
-			cfg.RabbitQueue,
-			false,
-			false,
-			false,
-			false,
-			nil,
-		)
-		failOnError(err, "failed to declare a queue")
-
 		db, err := sqlx.Open("pgx", cfg.PostgresDsn)
 		if err != nil {
-			failOnError(err, "connection to database failed")
+			log.Fatalf("connection to database failed %v", err)
 		}
 		storage, err := storages.NewPostgresStorage(db)
 		if err != nil {
-			failOnError(err, "unable to create postgres storage")
+			log.Fatalf("unable to create postgres storage: %v", err)
 		}
 
 		ctx := context.Background()
+		producer := rabbitmq.NewProducer(ctx, cfg.RabbitUrl, cfg.RabbitExchange, cfg.RabbitQueue)
+
 		duration := 10 * time.Second
 		log.Printf("check events every %v", duration)
 		for range time.Tick(duration) {
-			sendMessage(ctx, storage, channel, queue)
+			sendMessage(ctx, storage, producer)
 		}
 	},
 }
 
-func sendMessage(ctx context.Context, storage interfaces.EventStorage, ch *amqp.Channel, q amqp.Queue) {
+func sendMessage(ctx context.Context, storage interfaces.EventStorage, producer *rabbitmq.Producer) {
 	events, err := getEvents(ctx, storage)
 	if err != nil {
-		failOnError(err, "error on get events")
+		log.Fatalf("error on get events: %v", err)
 	}
 
 	for _, event := range events {
 		body, err := json.Marshal(event)
 		if err != nil {
-			failOnError(err, "error on marshal event")
+			log.Fatalf("error on marshal event: %v", err)
 		}
-		err = ch.Publish(
-			"",
-			q.Name,
-			false,
-			false,
-			amqp.Publishing{
-				ContentType: "text/plain",
-				Body:        []byte(body),
-			})
+
+		err = producer.Publish(body)
 		log.Printf("sent %s\n", body)
-		failOnError(err, "failed to publish a message")
+		if err != nil {
+			log.Fatalf("failed to publish a message: %v", err)
+		}
 	}
 }
 

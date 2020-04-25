@@ -1,7 +1,13 @@
 package cmd
 
 import (
+	"context"
+	"fmt"
 	"log"
+	"os"
+	"os/signal"
+
+	"github.com/Temain/otus-golang/hw-25/internal/rabbitmq"
 
 	"github.com/Temain/otus-golang/hw-25/internal/configer"
 	"github.com/spf13/cobra"
@@ -16,49 +22,45 @@ var SenderCmd = &cobra.Command{
 		log.Println("running sender...")
 
 		cfg := configer.ReadConfig()
-		conn, err := amqp.Dial(cfg.RabbitUrl)
-		failOnError(err, "failed to connect to RabbitMQ")
-		defer conn.Close()
+		ctx, _ := withSignal(context.Background(), os.Interrupt)
+		consumer := rabbitmq.NewConsumer(ctx, "tag", cfg.RabbitUrl, cfg.RabbitExchange, cfg.RabbitExchangeType, cfg.RabbitQueue, "")
+		err := consumer.Handle(handleMessages, 5)
+		if err != nil {
+			log.Fatalf("error on handle messages: %v", err)
+		}
 
-		channel, err := conn.Channel()
-		failOnError(err, "failed to open a channel")
-		defer channel.Close()
-
-		queue, err := channel.QueueDeclare(
-			cfg.RabbitQueue,
-			false,
-			false,
-			false,
-			false,
-			nil,
-		)
-		failOnError(err, "failed to declare a queue")
-
-		msgs, err := channel.Consume(
-			queue.Name,
-			"",
-			true,
-			false,
-			false,
-			false,
-			nil,
-		)
-		failOnError(err, "failed to register a consumer")
-
-		forever := make(chan bool)
-		go func() {
-			for d := range msgs {
-				log.Printf("Received a message: %s", d.Body)
-			}
-		}()
-
-		log.Printf("waiting for messages...")
-		<-forever
+		select {
+		case <-ctx.Done():
+			fmt.Println("shutdown signal received")
+		}
 	},
 }
 
-func failOnError(err error, msg string) {
-	if err != nil {
-		log.Fatalf("%s: %s", msg, err)
+func handleMessages(ctx context.Context, delivery <-chan amqp.Delivery) {
+	for {
+		select {
+		case d := <-delivery:
+			log.Printf("received a message: %s", d.Body)
+			break
+		case <-ctx.Done():
+			log.Printf("goroutine done")
+			return
+		}
 	}
+}
+
+func withSignal(ctx context.Context, s ...os.Signal) (context.Context, context.CancelFunc) {
+	ctx, cancel := context.WithCancel(ctx)
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, s...)
+	go func() {
+		select {
+		case <-c:
+			cancel()
+		case <-ctx.Done():
+			cancel()
+		}
+		signal.Stop(c)
+	}()
+	return ctx, cancel
 }

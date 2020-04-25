@@ -3,6 +3,7 @@ module github.com/Temain/otus-golang/hw-25
 go 1.14
 
 require (
+	github.com/cenkalti/backoff/v3 v3.2.2
 	github.com/heetch/confita v0.9.0
 	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/jmoiron/sqlx v1.2.0
