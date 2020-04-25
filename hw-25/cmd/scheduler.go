@@ -43,7 +43,7 @@ var SchedulerCmd = &cobra.Command{
 		failOnError(err, "failed to declare a queue")
 
 		ctx := context.Background()
-		storage, err := s.NewPostgreStorage(cfg.PostgreDSN)
+		storage, err := s.NewPostgresStorage(cfg.PostgreDSN)
 		if err != nil {
 			failOnError(err, "connection to database failed")
 		}
@@ -56,7 +56,7 @@ var SchedulerCmd = &cobra.Command{
 	},
 }
 
-func sendMessage(ctx context.Context, storage i.ICalendarStorage, ch *amqp.Channel, q amqp.Queue) {
+func sendMessage(ctx context.Context, storage i.EventStorage, ch *amqp.Channel, q amqp.Queue) {
 	events, err := getEvents(ctx, storage)
 	if err != nil {
 		failOnError(err, "error on get events")
@@ -81,7 +81,7 @@ func sendMessage(ctx context.Context, storage i.ICalendarStorage, ch *amqp.Chann
 	}
 }
 
-func getEvents(ctx context.Context, storage i.ICalendarStorage) ([]e.Event, error) {
+func getEvents(ctx context.Context, storage i.EventStorage) ([]e.Event, error) {
 	// TODO: additional logic for select events
 	events, err := storage.List(ctx)
 	if err != nil {

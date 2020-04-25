@@ -4,19 +4,18 @@ import (
 	"context"
 	"time"
 
+	_ "github.com/jackc/pgx/stdlib"
 	"github.com/jmoiron/sqlx"
 
-	_ "github.com/jackc/pgx/stdlib"
-
-	e "github.com/Temain/otus-golang/hw-25/internal/domain/entities"
-	i "github.com/Temain/otus-golang/hw-25/internal/domain/interfaces"
+	"github.com/Temain/otus-golang/hw-25/internal/domain/entities"
+	interfaces "github.com/Temain/otus-golang/hw-25/internal/domain/interfaces"
 )
 
-type PostgreStorage struct {
+type PostgresStorage struct {
 	db *sqlx.DB
 }
 
-func NewPostgreStorage(dsn string) (i.ICalendarStorage, error) {
+func NewPostgresStorage(dsn string) (interfaces.EventStorage, error) {
 	db, err := sqlx.Open("pgx", dsn)
 	if err != nil {
 		return nil, err
@@ -26,23 +25,23 @@ func NewPostgreStorage(dsn string) (i.ICalendarStorage, error) {
 		return nil, err
 	}
 
-	return &PostgreStorage{db}, nil
+	return &PostgresStorage{db}, nil
 }
-func CreatePostgreStorage(db *sqlx.DB) (i.ICalendarStorage, error) {
+func CreatePostgresStorage(db *sqlx.DB) (interfaces.EventStorage, error) {
 	err := db.Ping()
 	if err != nil {
 		return nil, err
 	}
 
-	return &PostgreStorage{db}, nil
+	return &PostgresStorage{db}, nil
 }
 
-func (pc *PostgreStorage) List(ctx context.Context) ([]e.Event, error) {
+func (pc *PostgresStorage) List(ctx context.Context) ([]entities.Event, error) {
 	query := `
 		SELECT id, title, description, created FROM events
 	`
 
-	var events []e.Event
+	var events []entities.Event
 	err := pc.db.SelectContext(ctx, &events, query)
 	if err != nil {
 		return nil, err
@@ -51,14 +50,14 @@ func (pc *PostgreStorage) List(ctx context.Context) ([]e.Event, error) {
 	return events, nil
 }
 
-func (pc *PostgreStorage) Search(ctx context.Context, created time.Time) (*e.Event, error) {
+func (pc *PostgresStorage) Search(ctx context.Context, created time.Time) (*entities.Event, error) {
 	query := `
 		SELECT id, title, description, created 
 		FROM events 
 		WHERE created = $1 
 	`
 
-	var event e.Event
+	var event entities.Event
 	err := pc.db.GetContext(ctx, &event, query, created)
 	if err != nil {
 		return nil, err
@@ -67,14 +66,14 @@ func (pc *PostgreStorage) Search(ctx context.Context, created time.Time) (*e.Eve
 	return &event, nil
 }
 
-func (pc *PostgreStorage) Get(ctx context.Context, id int64) (*e.Event, error) {
+func (pc *PostgresStorage) Get(ctx context.Context, id int64) (*entities.Event, error) {
 	query := `
 		SELECT id, title, description, created 
 		FROM events 
 		WHERE id = $1 
 	`
 
-	var event e.Event
+	var event entities.Event
 	err := pc.db.GetContext(ctx, &event, query, id)
 	if err != nil {
 		return nil, err
@@ -83,7 +82,7 @@ func (pc *PostgreStorage) Get(ctx context.Context, id int64) (*e.Event, error) {
 	return &event, nil
 }
 
-func (pc *PostgreStorage) Add(ctx context.Context, event *e.Event) error {
+func (pc *PostgresStorage) Add(ctx context.Context, event *entities.Event) error {
 	query := `
 		INSERT INTO events(title, description, created)
 		VALUES (:title, :description, :created)
@@ -96,7 +95,7 @@ func (pc *PostgreStorage) Add(ctx context.Context, event *e.Event) error {
 	return nil
 }
 
-func (pc *PostgreStorage) Update(ctx context.Context, event *e.Event) error {
+func (pc *PostgresStorage) Update(ctx context.Context, event *entities.Event) error {
 	query := `
 		UPDATE events
 		SET title = :title,
@@ -112,7 +111,7 @@ func (pc *PostgreStorage) Update(ctx context.Context, event *e.Event) error {
 	return nil
 }
 
-func (pc *PostgreStorage) Delete(ctx context.Context, id int64) error {
+func (pc *PostgresStorage) Delete(ctx context.Context, id int64) error {
 	query := `
 		DELETE 
 		FROM events

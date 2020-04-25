@@ -1,26 +1,29 @@
 package calendar
 
 import (
+	"sync"
 	"time"
 
 	"github.com/Temain/otus-golang/hw-21/internal/calendar/entities"
 	interfaces "github.com/Temain/otus-golang/hw-21/internal/calendar/interfaces"
 )
 
-var index int64 = 1
-
 type MemoryStorage struct {
+	index  int64
 	events map[int64]*entities.Event
+	mux    sync.RWMutex
 }
 
 func NewMemoryStorage() interfaces.EventStorage {
-	return &MemoryStorage{events: map[int64]*entities.Event{}}
+	return &MemoryStorage{index: 1, events: map[int64]*entities.Event{}}
 }
 func CreateMemoryStorage(events map[int64]*entities.Event) interfaces.EventStorage {
-	return &MemoryStorage{events: events}
+	return &MemoryStorage{index: 1, events: events}
 }
 
 func (mc *MemoryStorage) List() ([]entities.Event, error) {
+	mc.mux.RLock()
+	defer mc.mux.RUnlock()
 	list := make([]entities.Event, 0, len(mc.events))
 	for _, event := range mc.events {
 		list = append(list, *event)
@@ -29,6 +32,8 @@ func (mc *MemoryStorage) List() ([]entities.Event, error) {
 }
 
 func (mc *MemoryStorage) Search(created time.Time) (*entities.Event, error) {
+	mc.mux.RLock()
+	defer mc.mux.RUnlock()
 	for _, event := range mc.events {
 		if event.Created == created {
 			return event, nil
@@ -39,6 +44,8 @@ func (mc *MemoryStorage) Search(created time.Time) (*entities.Event, error) {
 }
 
 func (mc *MemoryStorage) Get(id int64) (*entities.Event, error) {
+	mc.mux.RLock()
+	defer mc.mux.RUnlock()
 	found, ok := mc.events[id]
 	if !ok {
 		return nil, &entities.ErrEventNotFound{Id: id}
@@ -48,14 +55,18 @@ func (mc *MemoryStorage) Get(id int64) (*entities.Event, error) {
 }
 
 func (mc *MemoryStorage) Add(event *entities.Event) error {
-	event.Id = index
+	mc.mux.Lock()
+	defer mc.mux.Unlock()
+	event.Id = mc.index
 	mc.events[event.Id] = event
-	index++
+	mc.index++
 
 	return nil
 }
 
 func (mc *MemoryStorage) Update(event *entities.Event) error {
+	mc.mux.Lock()
+	defer mc.mux.Unlock()
 	current := mc.events[event.Id]
 	current.Title = event.Title
 	current.Description = event.Description
@@ -65,6 +76,8 @@ func (mc *MemoryStorage) Update(event *entities.Event) error {
 }
 
 func (mc *MemoryStorage) Delete(id int64) error {
+	mc.mux.Lock()
+	defer mc.mux.Unlock()
 	delete(mc.events, id)
 
 	return nil
