@@ -3,23 +3,23 @@ package calendar
 import (
 	"time"
 
-	e "github.com/Temain/otus-golang/hw-21/internal/calendar/entities"
-	i "github.com/Temain/otus-golang/hw-21/internal/calendar/interfaces"
+	"github.com/Temain/otus-golang/hw-21/internal/calendar/entities"
+	interfaces "github.com/Temain/otus-golang/hw-21/internal/calendar/interfaces"
 )
 
 type Calendar struct {
-	storage i.ICalendarStorage
+	storage interfaces.EventStorage
 }
 
-func NewMemoryCalendar() i.ICalendar {
+func NewMemoryCalendar() interfaces.EventAdapter {
 	storage := NewMemoryStorage()
 	return &Calendar{storage}
 }
-func CreateCalendar(storage i.ICalendarStorage) i.ICalendar {
+func CreateCalendar(storage interfaces.EventStorage) interfaces.EventAdapter {
 	return &Calendar{storage}
 }
 
-func (c *Calendar) List() ([]e.Event, error) {
+func (c *Calendar) List() ([]entities.Event, error) {
 	list, err := c.storage.List()
 	if err != nil {
 		return nil, err
@@ -27,28 +27,28 @@ func (c *Calendar) List() ([]e.Event, error) {
 	return list, nil
 }
 
-func (c *Calendar) Search(created time.Time) (*e.Event, error) {
+func (c *Calendar) Search(created time.Time) (*entities.Event, error) {
 	found, err := c.storage.Search(created)
 	if err != nil {
 		return nil, err
 	}
 
 	if found == nil {
-		return nil, &e.ErrEventDateNotFound{Date: created}
+		return nil, &entities.ErrEventDateNotFound{Date: created}
 	}
 
 	return found, nil
 }
 
-func (c *Calendar) Add(event *e.Event) error {
+func (c *Calendar) Add(event *entities.Event) error {
 	found, _ := c.storage.Get(event.Id)
 	if found != nil {
-		return &e.ErrEventAlreadyExists{Id: event.Id}
+		return &entities.ErrEventAlreadyExists{Id: event.Id}
 	}
 
 	found, _ = c.storage.Search(event.Created)
 	if found != nil {
-		return &e.ErrDateBusy{Date: event.Created}
+		return &entities.ErrDateBusy{Date: event.Created}
 	}
 
 	err := c.storage.Add(event)
@@ -59,15 +59,15 @@ func (c *Calendar) Add(event *e.Event) error {
 	return nil
 }
 
-func (c *Calendar) Update(event *e.Event) error {
+func (c *Calendar) Update(event *entities.Event) error {
 	found, _ := c.storage.Search(event.Created)
 	if found != nil {
-		return &e.ErrDateBusy{Date: event.Created}
+		return &entities.ErrDateBusy{Date: event.Created}
 	}
 
 	current, _ := c.storage.Get(event.Id)
 	if current == nil {
-		return &e.ErrEventNotFound{Id: event.Id}
+		return &entities.ErrEventNotFound{Id: event.Id}
 	}
 
 	err := c.storage.Update(event)
@@ -81,7 +81,7 @@ func (c *Calendar) Update(event *e.Event) error {
 func (c *Calendar) Delete(eventId int64) error {
 	event, _ := c.storage.Get(eventId)
 	if event == nil {
-		return &e.ErrEventNotFound{Id: eventId}
+		return &entities.ErrEventNotFound{Id: eventId}
 	}
 
 	err := c.storage.Delete(eventId)

@@ -4,12 +4,12 @@ import (
 	"testing"
 	"time"
 
-	e "github.com/Temain/otus-golang/hw-21/internal/calendar/entities"
+	"github.com/Temain/otus-golang/hw-21/internal/calendar/entities"
 )
 
 func TestAddEvent(t *testing.T) {
 	c := NewMemoryCalendar()
-	event := &e.Event{
+	event := &entities.Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
@@ -32,7 +32,7 @@ func TestAddEvent(t *testing.T) {
 
 func TestAddDuplicateEvent(t *testing.T) {
 	c := NewMemoryCalendar()
-	event := &e.Event{
+	event := &entities.Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
@@ -58,13 +58,13 @@ func TestList(t *testing.T) {
 		t.Fatal("bad result of list, should be empty list")
 	}
 
-	event := &e.Event{
+	event := &entities.Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
 		Created:     time.Now(),
 	}
-	s := CreateMemoryStorage(map[int64]*e.Event{1: event})
+	s := CreateMemoryStorage(map[int64]*entities.Event{1: event})
 	c = CreateCalendar(s)
 	events, err = c.List()
 	if err != nil {
@@ -77,13 +77,13 @@ func TestList(t *testing.T) {
 
 func TestSearchEvent(t *testing.T) {
 	created := time.Now()
-	event := &e.Event{
+	event := &entities.Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
 		Created:     created,
 	}
-	s := CreateMemoryStorage(map[int64]*e.Event{1: event})
+	s := CreateMemoryStorage(map[int64]*entities.Event{1: event})
 	c := CreateCalendar(s)
 	found, _ := c.Search(created)
 	if found == nil {
@@ -96,15 +96,15 @@ func TestSearchEvent(t *testing.T) {
 
 func TestUpdateEvent(t *testing.T) {
 	created := time.Now()
-	event := &e.Event{
+	event := &entities.Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
 		Created:     created,
 	}
-	s := CreateMemoryStorage(map[int64]*e.Event{1: event})
+	s := CreateMemoryStorage(map[int64]*entities.Event{1: event})
 	c := CreateCalendar(s)
-	eventNew := &e.Event{
+	eventNew := &entities.Event{
 		Id:          1,
 		Title:       "Evening tea",
 		Description: "Not bad",
@@ -132,13 +132,13 @@ func TestUpdateEvent(t *testing.T) {
 
 func TestDeleteEvent(t *testing.T) {
 	created := time.Now()
-	event := &e.Event{
+	event := &entities.Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
 		Created:     created,
 	}
-	s := CreateMemoryStorage(map[int64]*e.Event{1: event})
+	s := CreateMemoryStorage(map[int64]*entities.Event{1: event})
 	c := CreateCalendar(s)
 	events, _ := c.List()
 	if len(events) == 0 {

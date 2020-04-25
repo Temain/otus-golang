@@ -8,14 +8,16 @@ import (
 	i "github.com/Temain/otus-golang/hw-22/internal/calendar/interfaces"
 )
 
+var index int64 = 1
+
 type MemoryStorage struct {
 	events map[int64]*e.Event
 }
 
-func NewMemoryStorage() i.ICalendarStorage {
+func NewMemoryStorage() i.EventStorage {
 	return &MemoryStorage{events: map[int64]*e.Event{}}
 }
-func CreateMemoryStorage(events map[int64]*e.Event) i.ICalendarStorage {
+func CreateMemoryStorage(events map[int64]*e.Event) i.EventStorage {
 	return &MemoryStorage{events: events}
 }
 
@@ -47,7 +49,9 @@ func (mc *MemoryStorage) Get(ctx context.Context, id int64) (*e.Event, error) {
 }
 
 func (mc *MemoryStorage) Add(ctx context.Context, event *e.Event) error {
+	event.Id = index
 	mc.events[event.Id] = event
+	index++
 
 	return nil
 }

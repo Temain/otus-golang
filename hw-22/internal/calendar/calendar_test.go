@@ -5,14 +5,14 @@ import (
 	"testing"
 	"time"
 
-	e "github.com/Temain/otus-golang/hw-22/internal/calendar/entities"
-	s "github.com/Temain/otus-golang/hw-22/internal/calendar/storages"
+	"github.com/Temain/otus-golang/hw-22/internal/calendar/entities"
+	"github.com/Temain/otus-golang/hw-22/internal/calendar/storages"
 )
 
 func TestAddEvent(t *testing.T) {
 	ctx := context.Background()
 	c := NewMemoryCalendar()
-	event := &e.Event{
+	event := &entities.Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
@@ -36,7 +36,7 @@ func TestAddEvent(t *testing.T) {
 func TestAddDuplicateEvent(t *testing.T) {
 	ctx := context.Background()
 	c := NewMemoryCalendar()
-	event := &e.Event{
+	event := &entities.Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
@@ -63,13 +63,13 @@ func TestList(t *testing.T) {
 		t.Fatal("bad result of list, should be empty list")
 	}
 
-	event := &e.Event{
+	event := &entities.Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
 		Created:     time.Now(),
 	}
-	s := s.CreateMemoryStorage(map[int64]*e.Event{1: event})
+	s := storages.CreateMemoryStorage(map[int64]*entities.Event{1: event})
 	c = CreateCalendar(s)
 	events, err = c.List(ctx)
 	if err != nil {
@@ -83,13 +83,13 @@ func TestList(t *testing.T) {
 func TestSearchEvent(t *testing.T) {
 	ctx := context.Background()
 	created := time.Now()
-	event := &e.Event{
+	event := &entities.Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
 		Created:     created,
 	}
-	s := s.CreateMemoryStorage(map[int64]*e.Event{1: event})
+	s := storages.CreateMemoryStorage(map[int64]*entities.Event{1: event})
 	c := CreateCalendar(s)
 	found, _ := c.Search(ctx, created)
 	if found == nil {
@@ -103,15 +103,15 @@ func TestSearchEvent(t *testing.T) {
 func TestUpdateEvent(t *testing.T) {
 	ctx := context.Background()
 	created := time.Now()
-	event := &e.Event{
+	event := &entities.Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
 		Created:     created,
 	}
-	s := s.CreateMemoryStorage(map[int64]*e.Event{1: event})
+	s := storages.CreateMemoryStorage(map[int64]*entities.Event{1: event})
 	c := CreateCalendar(s)
-	eventNew := &e.Event{
+	eventNew := &entities.Event{
 		Id:          1,
 		Title:       "Evening tea",
 		Description: "Not bad",
@@ -140,13 +140,13 @@ func TestUpdateEvent(t *testing.T) {
 func TestDeleteEvent(t *testing.T) {
 	ctx := context.Background()
 	created := time.Now()
-	event := &e.Event{
+	event := &entities.Event{
 		Id:          1,
 		Title:       "Morning coffee",
 		Description: "The most important event of the day",
 		Created:     created,
 	}
-	s := s.CreateMemoryStorage(map[int64]*e.Event{1: event})
+	s := storages.CreateMemoryStorage(map[int64]*entities.Event{1: event})
 	c := CreateCalendar(s)
 	events, _ := c.List(ctx)
 	if len(events) == 0 {

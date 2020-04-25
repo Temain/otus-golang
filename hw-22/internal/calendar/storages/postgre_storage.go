@@ -16,7 +16,7 @@ type PostgreStorage struct {
 	db *sqlx.DB
 }
 
-func NewPostgreStorage(dsn string) (i.ICalendarStorage, error) {
+func NewPostgreStorage(dsn string) (i.EventStorage, error) {
 	db, err := sqlx.Open("pgx", dsn)
 	if err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func NewPostgreStorage(dsn string) (i.ICalendarStorage, error) {
 
 	return &PostgreStorage{db}, nil
 }
-func CreatePostgreStorage(db *sqlx.DB) (i.ICalendarStorage, error) {
+func CreatePostgreStorage(db *sqlx.DB) (i.EventStorage, error) {
 	err := db.Ping()
 	if err != nil {
 		return nil, err

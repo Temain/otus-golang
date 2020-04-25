@@ -2,13 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"net/http"
-	"time"
+	"log"
 
-	c "github.com/Temain/otus-golang/hw-21/internal/calendar"
-	e "github.com/Temain/otus-golang/hw-21/internal/calendar/entities"
-	"github.com/Temain/otus-golang/hw-21/internal/configer"
-	"github.com/Temain/otus-golang/hw-21/internal/logger"
+	"github.com/Temain/otus-golang/hw-21/internal/api"
 
 	"github.com/spf13/cobra"
 )
@@ -19,25 +15,7 @@ var HttpServerCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("running http server...")
 
-		cfg := configer.ReadConfig()
-		log := logger.NewLogger(cfg.LogFile, cfg.LogLevel)
-		calendar := c.NewMemoryCalendar()
-
-		http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
-			log.Println("hello")
-		})
-
-		http.HandleFunc("/add", func(w http.ResponseWriter, r *http.Request) {
-			event := &e.Event{
-				Id:          1,
-				Title:       "Morning coffee",
-				Description: "The most important event of the day",
-				Created:     time.Now(),
-			}
-			_ = calendar.Add(event)
-			log.Println("added new event")
-		})
-		err := http.ListenAndServe(cfg.HttpListen, nil)
+		err := api.StartHttpServer()
 		if err != nil {
 			log.Fatalf("http server error: %v", err)
 		}

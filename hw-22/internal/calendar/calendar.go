@@ -10,21 +10,21 @@ import (
 )
 
 type Calendar struct {
-	storage i.ICalendarStorage
+	storage i.EventStorage
 }
 
-func NewMemoryCalendar() i.ICalendar {
+func NewMemoryCalendar() i.EventAdapter {
 	storage := s.NewMemoryStorage()
 	return &Calendar{storage}
 }
-func NewPostgreCalendar(dsn string) (i.ICalendar, error) {
+func NewPostgreCalendar(dsn string) (i.EventAdapter, error) {
 	storage, err := s.NewPostgreStorage(dsn)
 	if err != nil {
 		return nil, err
 	}
 	return &Calendar{storage}, nil
 }
-func CreateCalendar(storage i.ICalendarStorage) i.ICalendar {
+func CreateCalendar(storage i.EventStorage) i.EventAdapter {
 	return &Calendar{storage}
 }
 
