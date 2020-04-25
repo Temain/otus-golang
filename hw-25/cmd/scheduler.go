@@ -3,18 +3,18 @@ package cmd
 import (
 	"context"
 	"encoding/json"
+
 	"log"
 	"time"
 
-	i "github.com/Temain/otus-golang/hw-25/internal/domain/interfaces"
-
-	e "github.com/Temain/otus-golang/hw-25/internal/domain/entities"
-
+	"github.com/jmoiron/sqlx"
 	"github.com/spf13/cobra"
 	"github.com/streadway/amqp"
 
 	"github.com/Temain/otus-golang/hw-25/internal/configer"
-	s "github.com/Temain/otus-golang/hw-25/internal/domain/storages"
+	"github.com/Temain/otus-golang/hw-25/internal/domain/entities"
+	interfaces "github.com/Temain/otus-golang/hw-25/internal/domain/interfaces"
+	"github.com/Temain/otus-golang/hw-25/internal/domain/storages"
 )
 
 var SchedulerCmd = &cobra.Command{
@@ -42,12 +42,16 @@ var SchedulerCmd = &cobra.Command{
 		)
 		failOnError(err, "failed to declare a queue")
 
-		ctx := context.Background()
-		storage, err := s.NewPostgresStorage(cfg.PostgreDSN)
+		db, err := sqlx.Open("pgx", cfg.PostgresDsn)
 		if err != nil {
 			failOnError(err, "connection to database failed")
 		}
+		storage, err := storages.NewPostgresStorage(db)
+		if err != nil {
+			failOnError(err, "unable to create postgres storage")
+		}
 
+		ctx := context.Background()
 		duration := 10 * time.Second
 		log.Printf("check events every %v", duration)
 		for range time.Tick(duration) {
@@ -56,7 +60,7 @@ var SchedulerCmd = &cobra.Command{
 	},
 }
 
-func sendMessage(ctx context.Context, storage i.EventStorage, ch *amqp.Channel, q amqp.Queue) {
+func sendMessage(ctx context.Context, storage interfaces.EventStorage, ch *amqp.Channel, q amqp.Queue) {
 	events, err := getEvents(ctx, storage)
 	if err != nil {
 		failOnError(err, "error on get events")
@@ -81,7 +85,7 @@ func sendMessage(ctx context.Context, storage i.EventStorage, ch *amqp.Channel, 
 	}
 }
 
-func getEvents(ctx context.Context, storage i.EventStorage) ([]e.Event, error) {
+func getEvents(ctx context.Context, storage interfaces.EventStorage) ([]entities.Event, error) {
 	// TODO: additional logic for select events
 	events, err := storage.List(ctx)
 	if err != nil {

@@ -7,6 +7,8 @@ import (
 	"log"
 	"net"
 
+	"github.com/jmoiron/sqlx"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
@@ -42,9 +44,14 @@ func StartGrpcServer() error {
 	grpcServer := grpc.NewServer()
 	reflection.Register(grpcServer)
 
-	calendar, err := calendar.NewPostgreCalendar(cfg.PostgreDSN)
+	db, err := sqlx.Open("pgx", cfg.PostgresDsn)
 	if err != nil {
-		log.Fatalf("unable to connect to database: %v", err)
+		log.Fatalf("connection to database failed: %v", err)
+	}
+
+	calendar, err := calendar.NewPostgresCalendar(db)
+	if err != nil {
+		log.Fatalf("unable to create calendar: %v", err)
 	}
 	log.Println("connected to database")
 

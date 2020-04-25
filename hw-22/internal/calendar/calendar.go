@@ -2,7 +2,10 @@ package calendar
 
 import (
 	"context"
+	"fmt"
 	"time"
+
+	"github.com/jmoiron/sqlx"
 
 	e "github.com/Temain/otus-golang/hw-22/internal/calendar/entities"
 	i "github.com/Temain/otus-golang/hw-22/internal/calendar/interfaces"
@@ -17,10 +20,10 @@ func NewMemoryCalendar() i.EventAdapter {
 	storage := s.NewMemoryStorage()
 	return &Calendar{storage}
 }
-func NewPostgreCalendar(dsn string) (i.EventAdapter, error) {
-	storage, err := s.NewPostgreStorage(dsn)
+func NewPostgresCalendar(db *sqlx.DB) (i.EventAdapter, error) {
+	storage, err := s.NewPostgresStorage(db)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to create postgres storage: %v", err)
 	}
 	return &Calendar{storage}, nil
 }

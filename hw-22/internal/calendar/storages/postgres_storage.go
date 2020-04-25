@@ -16,19 +16,7 @@ type PostgresStorage struct {
 	db *sqlx.DB
 }
 
-func NewPostgresStorage(dsn string) (i.EventStorage, error) {
-	db, err := sqlx.Open("pgx", dsn)
-	if err != nil {
-		return nil, err
-	}
-	err = db.Ping()
-	if err != nil {
-		return nil, err
-	}
-
-	return &PostgresStorage{db}, nil
-}
-func CreatePostgresStorage(db *sqlx.DB) (i.EventStorage, error) {
+func NewPostgresStorage(db *sqlx.DB) (i.EventStorage, error) {
 	err := db.Ping()
 	if err != nil {
 		return nil, err

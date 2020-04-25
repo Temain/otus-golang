@@ -23,6 +23,6 @@
 *.code-workspace
 
 # hw
-*logs.txt
+*logs/
 
 idea/*
