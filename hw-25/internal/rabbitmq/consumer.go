@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/cenkalti/backoff/v3"
@@ -161,9 +162,15 @@ func (c *Consumer) Handle(fn func(ctx context.Context, delivery <-chan amqp.Deli
 
 	fmt.Println("waiting for messages...")
 
+	wg := sync.WaitGroup{}
+
 	for {
 		for i := 0; i < threads; i++ {
-			go fn(c.ctx, delivery)
+			wg.Add(1)
+			go func(ctx context.Context, delivery <-chan amqp.Delivery) {
+				fn(ctx, delivery)
+				wg.Done()
+			}(c.ctx, delivery)
 		}
 
 		select {
@@ -177,6 +184,7 @@ func (c *Consumer) Handle(fn func(ctx context.Context, delivery <-chan amqp.Deli
 			}
 			break
 		case <-c.ctx.Done():
+			wg.Wait()
 			fmt.Println("handle done")
 			return nil
 		}
