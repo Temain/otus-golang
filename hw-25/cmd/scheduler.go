@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"log"
 	"time"
@@ -86,10 +87,9 @@ func sendMessage(ctx context.Context, storage interfaces.EventStorage, ch *amqp.
 }
 
 func getEvents(ctx context.Context, storage interfaces.EventStorage) ([]entities.Event, error) {
-	// TODO: additional logic for select events
 	events, err := storage.List(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error on retrieve events: %v", err)
 	}
 
 	return events, nil
