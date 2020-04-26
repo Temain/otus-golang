@@ -1,0 +1,8 @@
+{
+  "logFile": "logs/log_sender.txt",
+  "logLevel": "info",
+  "rabbitUrl" : "amqp://guest:guest@rabbit:5672/",
+  "rabbitExchange": "events-exchange",
+  "rabbitExchangeType": "fanout",
+  "rabbitQueue": "events-queue"
+}
