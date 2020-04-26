@@ -1,5 +1,5 @@
 {
-  "httpListen": ":80",
+  "httpListen": ":8888",
   "grpcListen": ":50051",
   "logFile": "logs/log_api.txt",
   "logLevel": "info",

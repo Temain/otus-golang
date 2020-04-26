@@ -11,5 +11,5 @@ COPY --from=builder /app/configs/config_api.json ./configs/config_api.json
 COPY --from=builder /app/main .
 RUN mkdir logs
 EXPOSE 8888
-CMD ["./main", "grpc_server", "--config=configs/config_api.json"]
+CMD ["./main", "http_server", "--config=configs/config_api.json"]
 

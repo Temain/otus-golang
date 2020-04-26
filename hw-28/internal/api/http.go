@@ -15,8 +15,10 @@ func StartHttpServer(configPath string) error {
 	log := logger.NewLogger(cfg.LogFile, cfg.LogLevel)
 	calendar := domain.NewMemoryCalendar()
 
-	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
-		log.Println("hello")
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		message := "hello"
+		log.Println(message)
+		w.Write([]byte(message))
 	})
 
 	http.HandleFunc("/add", func(w http.ResponseWriter, r *http.Request) {
