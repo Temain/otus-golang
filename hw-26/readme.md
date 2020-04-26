@@ -10,9 +10,9 @@
 
 Каждый из сервисов должен принимать путь файлу конфигурации:
 
-./calendar_api --config=/path/to/config.yaml
-./calendar_scheduler --config=/path/to/config.yaml
-./calendar_sender --config=/path/to/config.yaml
+./calendar_api --config=/path/to/config.yaml  
+./calendar_scheduler --config=/path/to/config.yaml  
+./calendar_sender --config=/path/to/config.yaml  
 
 Настройки СУБД и очереди собщений должны браться из файла конфигурации.
 Критерии оценки: Преподаватель может собрать все файлы одной одной командой
