@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: ./cmd/calendar_api/Dockerfile
+    restart: on-failure
     ports:
       - "8888:8888"
     networks:
@@ -17,6 +18,7 @@ services:
     build:
       context: .
       dockerfile: ./cmd/calendar_scheduler/Dockerfile
+    restart: on-failure
     networks:
       - calendar
     depends_on:
@@ -28,6 +30,7 @@ services:
     build:
       context: .
       dockerfile: ./cmd/calendar_sender/Dockerfile
+    restart: on-failure
     networks:
       - calendar
     depends_on:
@@ -54,6 +57,11 @@ services:
       - "5672:5672"
     networks:
       - calendar
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+      interval: 5s
+      timeout: 15s
+      retries: 1
 
 networks:
   calendar:
