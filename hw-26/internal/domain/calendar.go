@@ -1,4 +1,4 @@
-package calendar
+package domain
 
 import (
 	"context"
@@ -7,31 +7,31 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	e "github.com/Temain/otus-golang/hw-22/internal/calendar/entities"
-	i "github.com/Temain/otus-golang/hw-22/internal/calendar/interfaces"
-	s "github.com/Temain/otus-golang/hw-22/internal/calendar/storages"
+	"github.com/Temain/otus-golang/hw-26/internal/domain/entities"
+	interfaces "github.com/Temain/otus-golang/hw-26/internal/domain/interfaces"
+	"github.com/Temain/otus-golang/hw-26/internal/domain/storages"
 )
 
 type Calendar struct {
-	storage i.EventStorage
+	storage interfaces.EventStorage
 }
 
-func NewMemoryCalendar() i.EventAdapter {
-	storage := s.NewMemoryStorage()
+func NewMemoryCalendar() interfaces.EventAdapter {
+	storage := storages.NewMemoryStorage()
 	return &Calendar{storage}
 }
-func NewPostgresCalendar(db *sqlx.DB) (i.EventAdapter, error) {
-	storage, err := s.NewPostgresStorage(db)
+func NewPostgresCalendar(db *sqlx.DB) (interfaces.EventAdapter, error) {
+	storage, err := storages.NewPostgresStorage(db)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create postgres storage: %v", err)
 	}
 	return &Calendar{storage}, nil
 }
-func CreateCalendar(storage i.EventStorage) i.EventAdapter {
+func CreateCalendar(storage interfaces.EventStorage) interfaces.EventAdapter {
 	return &Calendar{storage}
 }
 
-func (c *Calendar) List(ctx context.Context) ([]e.Event, error) {
+func (c *Calendar) List(ctx context.Context) ([]entities.Event, error) {
 	list, err := c.storage.List(ctx)
 	if err != nil {
 		return nil, err
@@ -39,31 +39,31 @@ func (c *Calendar) List(ctx context.Context) ([]e.Event, error) {
 	return list, nil
 }
 
-func (c *Calendar) Search(ctx context.Context, created time.Time) (*e.Event, error) {
+func (c *Calendar) Search(ctx context.Context, created time.Time) (*entities.Event, error) {
 	found, err := c.storage.Search(ctx, created)
 	if err != nil {
 		return nil, err
 	}
 
 	if found == nil {
-		return nil, &e.ErrEventDateNotFound{Date: created}
+		return nil, &entities.ErrEventDateNotFound{Date: created}
 	}
 
 	return found, nil
 }
 
-func (c *Calendar) Add(ctx context.Context, event *e.Event) error {
+func (c *Calendar) Add(ctx context.Context, event *entities.Event) error {
 	found, err := c.storage.Get(ctx, event.Id)
 	if err != nil {
 		return err
 	}
 	if found != nil {
-		return &e.ErrEventAlreadyExists{Id: event.Id}
+		return &entities.ErrEventAlreadyExists{Id: event.Id}
 	}
 
 	found, _ = c.storage.Search(ctx, event.Created)
 	if found != nil {
-		return &e.ErrDateBusy{Date: event.Created}
+		return &entities.ErrDateBusy{Date: event.Created}
 	}
 
 	err = c.storage.Add(ctx, event)
@@ -74,18 +74,18 @@ func (c *Calendar) Add(ctx context.Context, event *e.Event) error {
 	return nil
 }
 
-func (c *Calendar) Update(ctx context.Context, event *e.Event) error {
+func (c *Calendar) Update(ctx context.Context, event *entities.Event) error {
 	found, err := c.storage.Search(ctx, event.Created)
 	if err != nil {
 		return err
 	}
 	if found != nil {
-		return &e.ErrDateBusy{Date: event.Created}
+		return &entities.ErrDateBusy{Date: event.Created}
 	}
 
 	current, _ := c.storage.Get(ctx, event.Id)
 	if current == nil {
-		return &e.ErrEventNotFound{Id: event.Id}
+		return &entities.ErrEventNotFound{Id: event.Id}
 	}
 
 	err = c.storage.Update(ctx, event)
@@ -102,7 +102,7 @@ func (c *Calendar) Delete(ctx context.Context, eventId int64) error {
 		return err
 	}
 	if event == nil {
-		return &e.ErrEventNotFound{Id: eventId}
+		return &entities.ErrEventNotFound{Id: eventId}
 	}
 
 	err = c.storage.Delete(ctx, eventId)

@@ -41,7 +41,10 @@ func (c *Calendar) Search(created time.Time) (*entities.Event, error) {
 }
 
 func (c *Calendar) Add(event *entities.Event) error {
-	found, _ := c.storage.Get(event.Id)
+	found, err := c.storage.Get(event.Id)
+	if err != nil {
+		return err
+	}
 	if found != nil {
 		return &entities.ErrEventAlreadyExists{Id: event.Id}
 	}
@@ -51,7 +54,7 @@ func (c *Calendar) Add(event *entities.Event) error {
 		return &entities.ErrDateBusy{Date: event.Created}
 	}
 
-	err := c.storage.Add(event)
+	err = c.storage.Add(event)
 	if err != nil {
 		return err
 	}
@@ -60,7 +63,10 @@ func (c *Calendar) Add(event *entities.Event) error {
 }
 
 func (c *Calendar) Update(event *entities.Event) error {
-	found, _ := c.storage.Search(event.Created)
+	found, err := c.storage.Search(event.Created)
+	if err != nil {
+		return err
+	}
 	if found != nil {
 		return &entities.ErrDateBusy{Date: event.Created}
 	}
@@ -70,7 +76,7 @@ func (c *Calendar) Update(event *entities.Event) error {
 		return &entities.ErrEventNotFound{Id: event.Id}
 	}
 
-	err := c.storage.Update(event)
+	err = c.storage.Update(event)
 	if err != nil {
 		return err
 	}
@@ -79,12 +85,15 @@ func (c *Calendar) Update(event *entities.Event) error {
 }
 
 func (c *Calendar) Delete(eventId int64) error {
-	event, _ := c.storage.Get(eventId)
+	event, err := c.storage.Get(eventId)
+	if err != nil {
+		return err
+	}
 	if event == nil {
 		return &entities.ErrEventNotFound{Id: eventId}
 	}
 
-	err := c.storage.Delete(eventId)
+	err = c.storage.Delete(eventId)
 	if err != nil {
 		return err
 	}
