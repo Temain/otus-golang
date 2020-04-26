@@ -4,7 +4,7 @@ services:
     container_name: calendar-api
     build:
       context: .
-      dockerfile: Dockerfile.api
+      dockerfile: ./cmd/calendar_api/Dockerfile
     ports:
       - "8888:8888"
     networks:
@@ -16,7 +16,7 @@ services:
     container_name: calendar-scheduler
     build:
       context: .
-      dockerfile: Dockerfile.scheduler
+      dockerfile: ./cmd/calendar_scheduler/Dockerfile
     networks:
       - calendar
     depends_on:
@@ -27,7 +27,7 @@ services:
     container_name: calendar-sender
     build:
       context: .
-      dockerfile: Dockerfile.sender
+      dockerfile: ./cmd/calendar_sender/Dockerfile
     networks:
       - calendar
     depends_on:

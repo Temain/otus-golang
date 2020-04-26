@@ -25,7 +25,7 @@ func NewProducer(ctx context.Context, uri string, exchangeName, queue string) *P
 	}
 }
 
-func (p *Producer) connect() error {
+func (p *Producer) Connect() error {
 	var err error
 	p.conn, err = amqp.Dial(p.uri)
 	if err != nil {
@@ -43,12 +43,7 @@ func (p *Producer) connect() error {
 }
 
 func (p *Producer) Publish(body []byte) error {
-	var err error
-	if err = p.connect(); err != nil {
-		return fmt.Errorf("error: %v", err)
-	}
-
-	err = p.channel.Publish(
+	err := p.channel.Publish(
 		p.exchangeName,
 		p.queue,
 		false,

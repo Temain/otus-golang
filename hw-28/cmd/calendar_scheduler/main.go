@@ -39,6 +39,10 @@ func main() {
 
 	ctx := context.Background()
 	producer := rabbitmq.NewProducer(ctx, cfg.RabbitUrl, cfg.RabbitExchange, cfg.RabbitQueue)
+	err = producer.Connect()
+	if err != nil {
+		log.Fatalf("connection to RabbitMQ failed: %v", err)
+	}
 
 	duration := 10 * time.Second
 	log.Printf("check events every %v", duration)
