@@ -7,6 +7,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/spf13/pflag"
+
 	"github.com/Temain/otus-golang/hw-26/internal/configer"
 	"github.com/Temain/otus-golang/hw-26/internal/domain/entities"
 	interfaces "github.com/Temain/otus-golang/hw-26/internal/domain/interfaces"
@@ -15,10 +17,17 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+var configPath string
+
+func init() {
+	pflag.StringVarP(&configPath, "config", "c", "configs/config.json", "Config file path")
+	pflag.Parse()
+}
+
 func main() {
 	log.Println("running scheduler...")
 
-	cfg := configer.ReadConfig()
+	cfg := configer.ReadConfigScheduler(configPath)
 	db, err := sqlx.Open("pgx", cfg.PostgresDsn)
 	if err != nil {
 		log.Fatalf("connection to database failed %v", err)

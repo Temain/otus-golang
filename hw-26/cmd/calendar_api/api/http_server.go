@@ -15,7 +15,7 @@ var HttpServerCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("running http server...")
 
-		err := api.StartHttpServer()
+		err := api.StartHttpServer(configPath)
 		if err != nil {
 			log.Fatalf("http server error: %v", err)
 		}

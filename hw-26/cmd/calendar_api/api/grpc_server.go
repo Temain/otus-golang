@@ -14,7 +14,7 @@ var GrpcServerCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Println("running gRPC server...")
 
-		err := api.StartGrpcServer()
+		err := api.StartGrpcServer(configPath)
 		if err != nil {
 			log.Fatalf("gRPC server error: %v", err)
 		}

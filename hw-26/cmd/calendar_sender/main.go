@@ -9,14 +9,22 @@ import (
 
 	"github.com/Temain/otus-golang/hw-26/internal/configer"
 	"github.com/Temain/otus-golang/hw-26/internal/rabbitmq"
+	"github.com/spf13/pflag"
 
 	"github.com/streadway/amqp"
 )
 
+var configPath string
+
+func init() {
+	pflag.StringVarP(&configPath, "config", "c", "configs/config.json", "Config file path")
+	pflag.Parse()
+}
+
 func main() {
 	log.Println("running sender...")
 
-	cfg := configer.ReadConfig()
+	cfg := configer.ReadConfigSender(configPath)
 	ctx, _ := withSignal(context.Background(), os.Interrupt)
 	consumer := rabbitmq.NewConsumer(ctx, "tag", cfg.RabbitUrl, cfg.RabbitExchange, cfg.RabbitExchangeType, cfg.RabbitQueue, "")
 	err := consumer.Handle(handleMessages, 5)

@@ -10,8 +10,8 @@ import (
 	"github.com/Temain/otus-golang/hw-26/internal/logger"
 )
 
-func StartHttpServer() error {
-	cfg := configer.ReadConfig()
+func StartHttpServer(configPath string) error {
+	cfg := configer.ReadConfigApi(configPath)
 	log := logger.NewLogger(cfg.LogFile, cfg.LogLevel)
 	calendar := domain.NewMemoryCalendar()
 

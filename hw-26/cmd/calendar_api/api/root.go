@@ -9,7 +9,11 @@ var RootCmd = &cobra.Command{
 	Short: "Simple calendar",
 }
 
+var configPath string
+
 func init() {
+	RootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "configs/config.json", "Config file path")
+
 	RootCmd.AddCommand(HttpServerCmd)
 	RootCmd.AddCommand(GrpcServerCmd)
 	RootCmd.AddCommand(GrpcClientCmd)

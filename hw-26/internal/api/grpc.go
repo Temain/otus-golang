@@ -33,8 +33,8 @@ type EventServer struct {
 	Calendar interfaces.EventAdapter
 }
 
-func StartGrpcServer() error {
-	cfg := configer.ReadConfig()
+func StartGrpcServer(configPath string) error {
+	cfg := configer.ReadConfigApi(configPath)
 	logr = logger.NewLogger(cfg.LogFile, cfg.LogLevel)
 	addr := fmt.Sprintf("0.0.0.0%s", cfg.GrpcListen)
 	listen, err := net.Listen("tcp", addr)
