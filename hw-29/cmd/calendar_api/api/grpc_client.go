@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	event "github.com/Temain/otus-golang/hw-29/pkg/proto"
+	event "github.com/Temain/otus-golang/hw-29/internal/proto"
 	"google.golang.org/grpc"
 
 	"github.com/golang/protobuf/ptypes"
