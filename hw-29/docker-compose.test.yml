@@ -4,7 +4,8 @@ services:
     build: tests
     command: "true"
     links:
-      - api
+      - http_api
+      - grpc_api
       - scheduler
       - sender
     environment:
@@ -12,14 +13,27 @@ services:
     networks:
       - calendar
 
-  api:
-    container_name: calendar-api
+  http_api:
+    container_name: calendar-http-api
     build:
       context: .
-      dockerfile: ./cmd/calendar_api/Dockerfile
+      dockerfile: ./cmd/calendar_api/Dockerfile.http
     restart: on-failure
     ports:
       - "8888:8888"
+    networks:
+      - calendar
+    depends_on:
+      - postgres
+
+  grpc_api:
+    container_name: calendar-grpc-api
+    build:
+      context: .
+      dockerfile: ./cmd/calendar_api/Dockerfile.grpc
+    restart: on-failure
+    ports:
+      - "50051:50051"
     networks:
       - calendar
     depends_on:
