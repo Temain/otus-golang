@@ -1,21 +1,54 @@
 package main
 
-import "github.com/cucumber/godog"
+import (
+	"fmt"
+	"io/ioutil"
+	"net/http"
 
-func iSendRequestTo(arg1, arg2 string) error {
-	return godog.ErrPending
+	"github.com/cucumber/godog"
+)
+
+type calendarTest struct {
+	responseStatusCode int
+	responseBody       []byte
 }
 
-func theResponseCodeShouldBe(arg1 int) error {
-	return godog.ErrPending
+func (test *calendarTest) iSendRequestTo(httpMethod, addr string) (err error) {
+	var r *http.Response
+
+	switch httpMethod {
+	case http.MethodGet:
+		r, err = http.Get(addr)
+	default:
+		err = fmt.Errorf("unknown method: %s", httpMethod)
+	}
+
+	if err != nil {
+		return
+	}
+	test.responseStatusCode = r.StatusCode
+	test.responseBody, err = ioutil.ReadAll(r.Body)
+	return
 }
 
-func theResponseShouldMatchText(arg1 string) error {
-	return godog.ErrPending
+func (test *calendarTest) theResponseCodeShouldBe(code int) (err error) {
+	if test.responseStatusCode != code {
+		return fmt.Errorf("unexpected status code: %d != %d", test.responseStatusCode, code)
+	}
+	return nil
+}
+
+func (test *calendarTest) theResponseShouldMatchText(text string) (err error) {
+	if string(test.responseBody) != text {
+		return fmt.Errorf("unexpected text: %s != %s", test.responseBody, text)
+	}
+	return nil
 }
 
 func FeatureContext(s *godog.Suite) {
-	s.Step(`^I send "([^"]*)" request to "([^"]*)"$`, iSendRequestTo)
-	s.Step(`^The response code should be (\d+)$`, theResponseCodeShouldBe)
-	s.Step(`^The response should match text "([^"]*)"$`, theResponseShouldMatchText)
+	test := new(calendarTest)
+
+	s.Step(`^I send "([^"]*)" request to "([^"]*)"$`, test.iSendRequestTo)
+	s.Step(`^The response code should be (\d+)$`, test.theResponseCodeShouldBe)
+	s.Step(`^The response should match text "([^"]*)"$`, test.theResponseShouldMatchText)
 }

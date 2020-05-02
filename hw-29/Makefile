@@ -17,7 +17,7 @@ run-sender:
 	go run $(PATH_SENDER) --config=configs/config_sender.json
 
 up:
-	docker-compose up -d --build
+	docker-compose -f docker-compose.yml up -d --build
 
 down:
 	docker-compose down

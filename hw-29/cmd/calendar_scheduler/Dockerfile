@@ -2,7 +2,7 @@ FROM golang:latest as builder
 LABEL maintainer="Otus Aseev A"
 WORKDIR /app
 COPY . .
-RUN GOOS=linux go build -o main ./cmd/calendar_scheduler
+RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/calendar_scheduler
 
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates

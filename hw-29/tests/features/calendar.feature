@@ -6,6 +6,6 @@ Feature: HTTP requests handling
 	I want to receive simple request
 
 	Scenario: Calendar API service is available
-		When I send "GET" request to "http://calendar_api:8888/hello"
+		When I send "GET" request to "http://api:8888/hello"
 		Then The response code should be 200
 		And The response should match text "hello"
