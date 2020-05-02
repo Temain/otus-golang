@@ -1,0 +1,9 @@
+{
+  "logFile": "logs/log_scheduler.txt",
+  "logLevel": "info",
+  "postgresDsn": "postgres://postgres:123456789@postgres:5432/calendar",
+  "rabbitUrl" : "amqp://guest:guest@rabbit:5672/",
+  "rabbitExchange": "events-exchange",
+  "rabbitExchangeType": "fanout",
+  "rabbitQueue": "events-queue"
+}
