@@ -26,3 +26,13 @@
 *logs/
 
 idea/*
+
+.idea/misc.xml
+
+.idea/modules.xml
+
+.idea/otus-golang.iml
+
+.idea/vcs.xml
+
+.idea/workspace.xml

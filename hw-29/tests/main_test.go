@@ -16,7 +16,8 @@ func TestMain(m *testing.M) {
 	time.Sleep(delay)
 
 	status := godog.RunWithOptions("integration", func(s *godog.Suite) {
-		FeatureContext(s)
+		FeatureContextHttp(s)
+		FeatureContextGrpc(s)
 	}, godog.Options{
 		Format:    "progress", // Замените на "pretty" для лучшего вывода
 		Paths:     []string{"features"},
