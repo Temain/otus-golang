@@ -18,7 +18,7 @@ import (
 	"github.com/Temain/otus-golang/hw-29/internal/domain/entities"
 	interfaces "github.com/Temain/otus-golang/hw-29/internal/domain/interfaces"
 	"github.com/Temain/otus-golang/hw-29/internal/logger"
-	"github.com/Temain/otus-golang/hw-29/internal/proto"
+	"github.com/Temain/otus-golang/hw-29/pkg/proto"
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/sirupsen/logrus"
