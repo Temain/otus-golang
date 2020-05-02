@@ -2,6 +2,7 @@ package storages
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	_ "github.com/jackc/pgx/stdlib"
@@ -48,6 +49,9 @@ func (pc *PostgresStorage) Search(ctx context.Context, created time.Time) (*enti
 	var event entities.Event
 	err := pc.db.GetContext(ctx, &event, query, created)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 
@@ -64,6 +68,9 @@ func (pc *PostgresStorage) Get(ctx context.Context, id int64) (*entities.Event, 
 	var event entities.Event
 	err := pc.db.GetContext(ctx, &event, query, id)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 

@@ -79,7 +79,7 @@ func (c *Calendar) Update(ctx context.Context, event *entities.Event) error {
 	if err != nil {
 		return err
 	}
-	if found != nil {
+	if found != nil && event.Id != found.Id {
 		return &entities.ErrDateBusy{Date: event.Created}
 	}
 

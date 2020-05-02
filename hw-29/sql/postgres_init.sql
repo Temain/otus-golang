@@ -6,6 +6,3 @@ CREATE TABLE public.events (
 );
 
 CREATE INDEX events_created_idx ON public.events (created);
-
-INSERT INTO public.events (title,description,created) VALUES
-('Evening tea','Not bad','2020-04-25 22:00:00');
