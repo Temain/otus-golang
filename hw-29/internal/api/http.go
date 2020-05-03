@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -31,5 +32,6 @@ func StartHttpServer(configPath string) error {
 		_ = calendar.Add(r.Context(), event)
 		log.Println("added new event")
 	})
-	return http.ListenAndServe(cfg.HttpListen, nil)
+	addr := fmt.Sprintf("%s:%d", cfg.HttpHost, cfg.HttpPort)
+	return http.ListenAndServe(addr, nil)
 }

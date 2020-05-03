@@ -36,7 +36,7 @@ type EventServer struct {
 func StartGrpcServer(configPath string) error {
 	cfg := configer.ReadConfigApi(configPath)
 	logr = logger.NewLogger(cfg.LogFile, cfg.LogLevel)
-	addr := fmt.Sprintf("0.0.0.0%s", cfg.GrpcListen)
+	addr := fmt.Sprintf("%s:%d", cfg.GrpcHost, cfg.GrpcPort)
 	listen, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatalf("failed to listen %v", err)
