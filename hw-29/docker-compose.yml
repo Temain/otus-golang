@@ -25,6 +25,8 @@ services:
       - calendar
     depends_on:
       - postgres
+    environment:
+      POSTGRES_DSN: "postgres://postgres:123456789@postgres:5432/calendar"
 
   scheduler:
     container_name: calendar-scheduler
@@ -37,6 +39,8 @@ services:
     depends_on:
       - postgres
       - rabbit
+    environment:
+      POSTGRES_DSN: "postgres://postgres:123456789@postgres:5432/calendar"
 
   sender:
     container_name: calendar-sender

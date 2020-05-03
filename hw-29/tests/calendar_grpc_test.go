@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"time"
 
 	event "github.com/Temain/otus-golang/hw-29/pkg/proto"
@@ -13,6 +14,14 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc"
 )
+
+var grpcListen = os.Getenv("TESTS_GRPC_API")
+
+func init() {
+	if grpcListen == "" {
+		grpcListen = "grpc_api:50051"
+	}
+}
 
 type calendarGrpcTest struct {
 	ctx          context.Context
@@ -28,7 +37,7 @@ type calendarGrpcTest struct {
 
 func (test *calendarGrpcTest) connect(*messages.Pickle) {
 	test.ctx, _ = context.WithTimeout(context.Background(), 5*time.Minute)
-	cc, err := grpc.Dial("grpc_api:50051", grpc.WithInsecure())
+	cc, err := grpc.Dial(grpcListen, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("could not connect: %v", err)
 	}

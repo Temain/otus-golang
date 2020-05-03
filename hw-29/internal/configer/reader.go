@@ -4,6 +4,8 @@ import (
 	"context"
 	"log"
 
+	"github.com/heetch/confita/backend/env"
+
 	"github.com/heetch/confita"
 	"github.com/heetch/confita/backend/file"
 )
@@ -11,6 +13,7 @@ import (
 func ReadConfigApi(path string) *ConfigApi {
 	loader := confita.NewLoader(
 		file.NewBackend(path),
+		env.NewBackend(),
 	)
 	cfg := ConfigApi{}
 	err := loader.Load(context.Background(), &cfg)
@@ -24,6 +27,7 @@ func ReadConfigApi(path string) *ConfigApi {
 func ReadConfigScheduler(path string) *ConfigScheduler {
 	loader := confita.NewLoader(
 		file.NewBackend(path),
+		env.NewBackend(),
 	)
 	cfg := ConfigScheduler{}
 	err := loader.Load(context.Background(), &cfg)
@@ -37,6 +41,7 @@ func ReadConfigScheduler(path string) *ConfigScheduler {
 func ReadConfigSender(path string) *ConfigSender {
 	loader := confita.NewLoader(
 		file.NewBackend(path),
+		env.NewBackend(),
 	)
 	cfg := ConfigSender{}
 	err := loader.Load(context.Background(), &cfg)
