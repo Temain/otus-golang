@@ -7,6 +7,10 @@ Feature: gRPC requests handling
 		When I call add method
 		Then Method should return success result
 
+	Scenario: Calendar gRPC API service add method can't add duplicate events
+		When I call add method with existing event
+		Then Method should return fail result
+
 	Scenario: Calendar gRPC API service list method is available
 		When I call list method
 		Then The result should be non empty
@@ -19,6 +23,14 @@ Feature: gRPC requests handling
 		When I call update method
 		Then Method should return success result
 
+	Scenario: Calendar gRPC API service update method can't update not existing event
+		When I call update method with not existing event
+		Then Method should return fail result
+
 	Scenario: Calendar gRPC API service delete method is available
 		When I call delete method
 		Then Method should return success result
+
+	Scenario: Calendar gRPC API service delete method can't delete not existing event
+		When I call delete method with not existing event
+		Then Method should return fail result

@@ -27,7 +27,6 @@ import (
 )
 
 var logr *logrus.Logger
-var index int64 = 1
 
 type EventServer struct {
 	Calendar interfaces.EventAdapter
@@ -104,14 +103,12 @@ func (s EventServer) Search(ctx context.Context, request *proto.SearchRequest) (
 
 func (s EventServer) Add(ctx context.Context, request *proto.AddRequest) (*proto.AddResponse, error) {
 	logr.Info("received add request")
-	defer func() { index++ }()
 	response := &proto.AddResponse{}
 	event, err := mapMessageToEvent(*request.Event)
 	if err != nil {
 		return response, status.Error(codes.Internal, "error on map event to response message")
 	}
 
-	event.Id = index
 	err = s.Calendar.Add(ctx, event)
 	if err != nil {
 		return response, status.Error(codes.Internal, fmt.Sprintf("error on add new event: %v", err))
