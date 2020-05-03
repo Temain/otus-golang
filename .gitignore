@@ -26,13 +26,12 @@
 *logs/
 
 idea/*
-
 .idea/misc.xml
-
 .idea/modules.xml
-
 .idea/otus-golang.iml
-
 .idea/vcs.xml
-
 .idea/workspace.xml
+
+calendar_api
+calendar_schedule
+calendar_sender
