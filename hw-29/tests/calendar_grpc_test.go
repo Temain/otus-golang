@@ -8,13 +8,13 @@ import (
 	"os"
 	"time"
 
-	"google.golang.org/grpc/status"
-
-	event "github.com/Temain/otus-golang/hw-29/pkg/proto"
 	"github.com/cucumber/godog"
 	"github.com/cucumber/messages-go/v10"
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
+
+	event "github.com/Temain/otus-golang/hw-29/pkg/proto"
 )
 
 var grpcListen = os.Getenv("TESTS_GRPC_API")
