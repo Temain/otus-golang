@@ -46,12 +46,14 @@ func (s RotationServer) GetBanner(ctx context.Context, request *proto.GetBannerR
 }
 
 func StartGrpcServer(configPath string) error {
+	log.Printf("Starting gRPC server...")
 	cfg := configer.ReadConfig(configPath)
+	log.Printf("config: %v", cfg)
 	logr = logger.NewLogger(cfg.LogFile, cfg.LogLevel)
-	addr := fmt.Sprintf("%s:%d", cfg.GrpcPort, cfg.GrpcPort)
+	addr := fmt.Sprintf("%s:%d", cfg.GrpcHost, cfg.GrpcPort)
 	listen, err := net.Listen("tcp", addr)
 	if err != nil {
-		log.Fatalf("failed to listen %v", err)
+		return fmt.Errorf("failed to listen %v", err)
 	}
 
 	grpcServer := grpc.NewServer()
@@ -59,16 +61,21 @@ func StartGrpcServer(configPath string) error {
 
 	db, err := sqlx.Open("pgx", cfg.PostgresDsn)
 	if err != nil {
-		log.Fatalf("connection to database failed: %v", err)
+		return fmt.Errorf("connection to database failed: %v", err)
 	}
 
 	rotator, err := domain.NewBannerRotator(db)
 	if err != nil {
-		log.Fatalf("unable to create rotation service: %v", err)
+		return fmt.Errorf("unable to create rotation service: %v", err)
 	}
 	log.Println("connected to database")
 
 	rotationServer := &RotationServer{Rotator: rotator}
 	proto.RegisterRotationServiceServer(grpcServer, rotationServer)
-	return grpcServer.Serve(listen)
+	err = grpcServer.Serve(listen)
+	if err != nil {
+		return fmt.Errorf("error on serve gRPC server: %v", err)
+	}
+
+	return nil
 }

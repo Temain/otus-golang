@@ -4,7 +4,7 @@ build:
 	go build $(PATH_API)
 
 run-api:
-	go run $(PATH_API) --config=configs/config_api.json
+	go run $(PATH_API) --config=configs/config.json
 
 up:
 	docker-compose up -d --build

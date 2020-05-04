@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	_ "github.com/jackc/pgx/stdlib"
 	"github.com/jmoiron/sqlx"
 
 	"github.com/Temain/otus-golang/project/internal/domain/entities"
@@ -37,7 +38,7 @@ func (pc *PgBannerStorage) List(ctx context.Context) ([]entities.Banner, error) 
 	return banners, nil
 }
 
-func (pc *PgBannerStorage) Search(ctx context.Context, pattern string) (*entities.Baner, error) {
+func (pc *PgBannerStorage) Search(ctx context.Context, pattern string) (*entities.Banner, error) {
 	query := `
 		SELECT id, title 
 		FROM banners 
@@ -75,9 +76,9 @@ func (pc *PgBannerStorage) Get(ctx context.Context, id int64) (*entities.Banner,
 	return &banner, nil
 }
 
-func (pc *PgBannerStorage) Add(ctx context.Context, Banner *entities.Baner) error {
+func (pc *PgBannerStorage) Add(ctx context.Context, banner *entities.Banner) error {
 	query := `
-		INSERT INTO Banners(title)
+		INSERT INTO banners(title)
 		VALUES (:title)
 	`
 	_, err := pc.db.NamedExecContext(ctx, query, banner)

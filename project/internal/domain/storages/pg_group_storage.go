@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	_ "github.com/jackc/pgx/stdlib"
 	"github.com/jmoiron/sqlx"
 
 	"github.com/Temain/otus-golang/project/internal/domain/entities"
@@ -53,7 +54,7 @@ func (pc *PgGroupStorage) Search(ctx context.Context, pattern string) (*entities
 		return nil, err
 	}
 
-	return &slot, nil
+	return &group, nil
 }
 
 func (pc *PgGroupStorage) Get(ctx context.Context, id int64) (*entities.Group, error) {

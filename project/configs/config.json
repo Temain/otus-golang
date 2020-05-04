@@ -1,7 +1,7 @@
 {
   "grpcHost": "0.0.0.0",
-  "grpcPort": 50051,
+  "grpcPort": 50052,
   "logFile": "logs/log_api.txt",
   "logLevel": "info",
-  "postgresDsn": "postgres://postgres:123456789@postgres:5432/calendar"
+  "postgresDsn": "postgres://postgres:123456789@localhost:5432/banner_rotation"
 }

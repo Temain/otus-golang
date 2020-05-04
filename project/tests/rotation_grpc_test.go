@@ -1,13 +1,11 @@
-package tests
+package main
 
 import (
 	"context"
-	"fmt"
-	"log"
 	"os"
-	"time"
 
-	"github.com/Temain/otus-golang/project/pkg/proto"
+	pr "github.com/Temain/otus-golang/project/pkg/proto"
+
 	"github.com/cucumber/godog"
 	"github.com/cucumber/messages-go/v10"
 	"google.golang.org/grpc"
@@ -24,7 +22,7 @@ func init() {
 type rotationGrpcTest struct {
 	ctx        context.Context
 	clientConn *grpc.ClientConn
-	client     proto.RotationServiceClient
+	client     pr.RotationServiceClient
 	// sampleEvent        *event.EventMessage
 	// listResult         []event.EventMessage
 	// searchResult       *event.EventMessage
@@ -37,13 +35,13 @@ type rotationGrpcTest struct {
 }
 
 func (test *rotationGrpcTest) connect(*messages.Pickle) {
-	test.ctx, _ = context.WithTimeout(context.Background(), 5*time.Minute)
-	cc, err := grpc.Dial(grpcListen, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("could not connect: %v", err)
-	}
-	test.client = proto.NewEventServiceClient(cc)
-	test.clientConn = cc
+	// test.ctx, _ = context.WithTimeout(context.Background(), 5*time.Minute)
+	//cc, err := grpc.Dial(grpcListen, grpc.WithInsecure())
+	//if err != nil {
+	//	log.Fatalf("could not connect: %v", err)
+	//}
+	//test.client = proto.NewEventServiceClient(cc)
+	//test.clientConn = cc
 	//
 	//sampleTime := time.Date(2020, 04, 22, 10, 00, 00, 00, time.UTC)
 	//created, err := ptypes.TimestampProto(sampleTime)
@@ -59,16 +57,38 @@ func (test *rotationGrpcTest) connect(*messages.Pickle) {
 }
 
 func (test *rotationGrpcTest) close(*messages.Pickle, error) {
-	err := test.clientConn.Close()
-	if err != nil {
-		fmt.Errorf("error on close connection: %v", err)
-	}
+	//err := test.clientConn.Close()
+	//if err != nil {
+	//	fmt.Errorf("error on close connection: %v", err)
+	//}
 }
 
-func FeatureContextGrpc(s *godog.Suite) {
+func (test *rotationGrpcTest) iCallAddMethod() error {
+	//request := &proto.AddBannerRequest{}
+	//response, err := test.client.Add(test.ctx, request)
+	//if err != nil {
+	//	return fmt.Errorf("error on add event: %v", err)
+	//}
+
+	// test.addResult = response.Success
+
+	return nil
+}
+
+func (test *rotationGrpcTest) theAddResultShouldBeSuccess() error {
+	//if !test.addResult {
+	//	return fmt.Errorf("new event not added")
+	//}
+	return nil
+}
+
+func FeatureContext(s *godog.Suite) {
 	testGrpc := new(rotationGrpcTest)
 
 	s.BeforeScenario(testGrpc.connect)
+
+	s.Step(`^I call add method$`, testGrpc.iCallAddMethod)
+	s.Step(`^Method should return success result$`, testGrpc.theAddResultShouldBeSuccess)
 
 	s.AfterScenario(testGrpc.close)
 }
