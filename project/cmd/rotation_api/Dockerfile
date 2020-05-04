@@ -1,7 +1,7 @@
 FROM golang:latest as builder
 LABEL maintainer="Otus Aseev A"
 WORKDIR /app
-COPY .. .
+COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/rotation_api
 
 FROM alpine:latest
