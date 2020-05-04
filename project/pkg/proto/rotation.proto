@@ -1,0 +1,61 @@
+syntax = "proto3";
+option go_package = ".;proto";
+
+package proto;
+
+message BannerMessage {
+  int64 id = 1;
+  int64 title = 2;
+}
+
+message AddBannerRequest {
+  int64 bannerId = 1;
+  int64 slotId = 2;
+}
+
+message AddBannerResponse {
+  BannerMessage banner = 1;
+}
+
+message DeleteBannerRequest {
+  int64 bannerId = 1;
+  int64 slotId = 2;
+}
+
+message DeleteBannerResponse {
+  bool success = 1;
+}
+
+message ClickBannerRequest {
+  int64 bannerId = 1;
+  int64 slotId = 2;
+  int64 groupId = 3;
+}
+
+message ClickBannerResponse {
+  bool success = 1;
+}
+
+message GetBannerRequest {
+  int64 slotId = 1;
+  int64 groupId = 2;
+}
+
+message GetBannerResponse {
+  int64 bannerId = 1;
+}
+
+service RotationService {
+  // Добавляет новый баннер в ротацию в данном слоте.
+  rpc AddBanner (AddBannerRequest) returns (AddBannerResponse);
+
+  // Удаляет баннер из ротации в данном слоте.
+  rpc DeleteBanner (DeleteBannerRequest) returns (DeleteBannerResponse);
+
+  // Увеличивает счетчик переходов на 1 для указанного баннера в данном слоте в указанной группе.
+  rpc ClickBanner (ClickBannerRequest) returns (ClickBannerResponse);
+
+  // Возвращает баннер который следует показать в данный момент в указанном слоте для указанной соц-дем. группы.
+  // Увеличивает число показов баннера в группе.
+  rpc GetBanner (GetBannerRequest) returns (GetBannerResponse);
+}
