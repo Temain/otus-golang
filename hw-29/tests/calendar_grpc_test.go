@@ -8,6 +8,8 @@ import (
 	"os"
 	"time"
 
+	"google.golang.org/grpc/status"
+
 	event "github.com/Temain/otus-golang/hw-29/pkg/proto"
 	"github.com/cucumber/godog"
 	"github.com/cucumber/messages-go/v10"
@@ -24,18 +26,26 @@ func init() {
 }
 
 type calendarGrpcTest struct {
-	ctx                context.Context
-	clientConn         *grpc.ClientConn
-	client             event.EventServiceClient
-	sampleEvent        *event.EventMessage
-	listResult         []event.EventMessage
-	searchResult       *event.EventMessage
-	addResult          bool
-	addDuplicateResult bool
-	updateResult       bool
-	updateNotExists    bool
-	deleteResult       bool
-	deleteNotExists    bool
+	ctx                 context.Context
+	clientConn          *grpc.ClientConn
+	client              event.EventServiceClient
+	sampleEvent         *event.EventMessage
+	listResult          []event.EventMessage
+	listCode            int
+	searchResult        *event.EventMessage
+	searchCode          int
+	addResult           bool
+	addCode             int
+	addDuplicateResult  bool
+	addDuplicateCode    int
+	updateResult        bool
+	updateCode          int
+	updateNotExists     bool
+	updateNotExistsCode int
+	deleteResult        bool
+	deleteCode          int
+	deleteNotExists     bool
+	deleteNotExistsCode int
 }
 
 func (test *calendarGrpcTest) connect(*messages.Pickle) {
@@ -67,9 +77,71 @@ func (test *calendarGrpcTest) close(*messages.Pickle, error) {
 	}
 }
 
-func (test *calendarGrpcTest) iCallListMethod() error {
+func getStatusCode(err error) (code int) {
+	statusErr, ok := status.FromError(err)
+	if ok {
+		code = int(statusErr.Code())
+	} else {
+		code = -1
+	}
+	return code
+}
+
+func (test *calendarGrpcTest) iSendRequestToAddMethod() error {
+	request := &event.AddRequest{Event: test.sampleEvent}
+	response, err := test.client.Add(test.ctx, request)
+	if err != nil {
+		test.addCode = getStatusCode(err)
+		return fmt.Errorf("error on add event: %v", err)
+	}
+
+	test.addResult = response.Success
+
+	return nil
+}
+
+func (test *calendarGrpcTest) theAddRequestResponseCodeShouldBeOk(code int) error {
+	if test.addCode != code {
+		return fmt.Errorf("unexpected status code: %d != %d", test.addDuplicateCode, code)
+	}
+	return nil
+}
+
+func (test *calendarGrpcTest) theAddRequestResponseShouldBeWithValueTrue() error {
+	if !test.addResult {
+		return fmt.Errorf("new event not added")
+	}
+	return nil
+}
+
+func (test *calendarGrpcTest) iSendRequestToAddMethodWithExistingEvent() error {
+	request := &event.AddRequest{Event: test.sampleEvent}
+	_, err := test.client.Add(test.ctx, request)
+	if err != nil {
+		test.addDuplicateCode = getStatusCode(err)
+		test.addDuplicateResult = false
+	}
+	return nil
+}
+
+func (test *calendarGrpcTest) theAddRequestResponseCodeShouldBeInternalError(code int) error {
+	if test.addDuplicateCode != code {
+		return fmt.Errorf("unexpected status code: %d != %d", test.addDuplicateCode, code)
+	}
+	return nil
+}
+
+func (test *calendarGrpcTest) theAddRequestResponseShouldBeWithValueFalse() error {
+	if test.addDuplicateResult {
+		return fmt.Errorf("duplicate event added")
+	}
+	return nil
+}
+
+func (test *calendarGrpcTest) iSendRequestToListMethod() error {
 	stream, err := test.client.List(test.ctx, &event.ListRequest{})
 	if err != nil {
+		test.listCode = getStatusCode(err)
 		err = fmt.Errorf("error on list events: %v", err)
 	}
 
@@ -94,17 +166,25 @@ func (test *calendarGrpcTest) iCallListMethod() error {
 	return err
 }
 
-func (test *calendarGrpcTest) theListResultShouldBeNonEmpty() error {
+func (test *calendarGrpcTest) theListRequestResponseCodeShouldBeOk(code int) error {
+	if test.listCode != code {
+		return fmt.Errorf("unexpected status code: %d != %d", test.addDuplicateCode, code)
+	}
+	return nil
+}
+
+func (test *calendarGrpcTest) theListRequestResponseShouldBeNonEmpty() error {
 	if len(test.listResult) == 0 {
 		return fmt.Errorf("result of list method is empty")
 	}
 	return nil
 }
 
-func (test *calendarGrpcTest) iCallSearchMethod() error {
+func (test *calendarGrpcTest) iSendRequestToSearchMethod() error {
 	created := test.sampleEvent.Created
 	response, err := test.client.Search(test.ctx, &event.SearchRequest{Date: created})
 	if err != nil {
+		test.searchCode = getStatusCode(err)
 		return fmt.Errorf("error on search event: %v", err)
 	}
 
@@ -113,52 +193,25 @@ func (test *calendarGrpcTest) iCallSearchMethod() error {
 	return nil
 }
 
-func (test *calendarGrpcTest) theSearchResultShouldBeNonEmpty() error {
+func (test *calendarGrpcTest) theSearchRequestResponseCodeShouldBeOk(code int) error {
+	if test.searchCode != code {
+		return fmt.Errorf("unexpected status code: %d != %d", test.addDuplicateCode, code)
+	}
+	return nil
+}
+
+func (test *calendarGrpcTest) theSearchRequestResponseShouldContainsEvent() error {
 	if test.searchResult == nil {
 		return fmt.Errorf("result of search method is empty")
 	}
 	return nil
 }
 
-func (test *calendarGrpcTest) iCallAddMethod() error {
-	request := &event.AddRequest{Event: test.sampleEvent}
-	response, err := test.client.Add(test.ctx, request)
-	if err != nil {
-		return fmt.Errorf("error on add event: %v", err)
-	}
-
-	test.addResult = response.Success
-
-	return nil
-}
-
-func (test *calendarGrpcTest) theAddResultShouldBeSuccess() error {
-	if !test.addResult {
-		return fmt.Errorf("new event not added")
-	}
-	return nil
-}
-
-func (test *calendarGrpcTest) iCallAddMethodWithExistingEvent() error {
-	request := &event.AddRequest{Event: test.sampleEvent}
-	_, err := test.client.Add(test.ctx, request)
-	if err != nil {
-		test.addDuplicateResult = false
-	}
-	return nil
-}
-
-func (test *calendarGrpcTest) theAddWithExistingShouldReturnFailResult() error {
-	if test.addDuplicateResult {
-		return fmt.Errorf("duplicate event added")
-	}
-	return nil
-}
-
-func (test *calendarGrpcTest) iCallUpdateMethod() error {
+func (test *calendarGrpcTest) iSendRequestToUpdateMethod() error {
 	request := &event.UpdateRequest{Event: test.sampleEvent}
 	response, err := test.client.Update(test.ctx, request)
 	if err != nil {
+		test.updateCode = getStatusCode(err)
 		return fmt.Errorf("error on update event: %v", err)
 	}
 
@@ -167,14 +220,21 @@ func (test *calendarGrpcTest) iCallUpdateMethod() error {
 	return nil
 }
 
-func (test *calendarGrpcTest) theUpdateResultShouldBeSuccess() error {
+func (test *calendarGrpcTest) theUpdateRequestResponseCodeShouldBeOk(code int) error {
+	if test.updateCode != code {
+		return fmt.Errorf("unexpected status code: %d != %d", test.addDuplicateCode, code)
+	}
+	return nil
+}
+
+func (test *calendarGrpcTest) theUpdateRequestResponseShouldBeWithValueTrue() error {
 	if !test.updateResult {
 		return fmt.Errorf("event not updated")
 	}
 	return nil
 }
 
-func (test *calendarGrpcTest) iCallUpdateNotExistingMethod() error {
+func (test *calendarGrpcTest) iSendRequestToUpdateMethodWithNotExistingEvent() error {
 	created, err := ptypes.TimestampProto(time.Now())
 	if err != nil {
 		return fmt.Errorf("wrong event date: %v", err)
@@ -188,23 +248,32 @@ func (test *calendarGrpcTest) iCallUpdateNotExistingMethod() error {
 	request := &event.UpdateRequest{Event: notExists}
 	_, err = test.client.Update(test.ctx, request)
 	if err != nil {
+		test.updateNotExistsCode = getStatusCode(err)
 		test.updateNotExists = false
 	}
 
 	return nil
 }
 
-func (test *calendarGrpcTest) theUpdateNotExistingResultShouldBeFail() error {
+func (test *calendarGrpcTest) theUpdateRequestResponseCodeShouldBeInternalError(code int) error {
+	if test.updateNotExistsCode != code {
+		return fmt.Errorf("unexpected status code: %d != %d", test.addDuplicateCode, code)
+	}
+	return nil
+}
+
+func (test *calendarGrpcTest) theUpdateRequestResponseShouldBeWithValueFalse() error {
 	if test.updateNotExists {
 		return fmt.Errorf("not existing event updated")
 	}
 	return nil
 }
 
-func (test *calendarGrpcTest) iCallDeleteMethod() error {
+func (test *calendarGrpcTest) iSendRequestToDeleteMethod() error {
 	request := &event.DeleteRequest{Id: 1}
 	response, err := test.client.Delete(test.ctx, request)
 	if err != nil {
+		test.deleteCode = getStatusCode(err)
 		return fmt.Errorf("error on delete event: %v", err)
 	}
 
@@ -213,25 +282,40 @@ func (test *calendarGrpcTest) iCallDeleteMethod() error {
 	return nil
 }
 
-func (test *calendarGrpcTest) theDeleteResultShouldBeSuccess() error {
+func (test *calendarGrpcTest) theDeleteRequestResponseCodeShouldBeOk(code int) error {
+	if test.deleteCode != code {
+		return fmt.Errorf("unexpected status code: %d != %d", test.addDuplicateCode, code)
+	}
+	return nil
+}
+
+func (test *calendarGrpcTest) theDeleteRequestResponseShouldBeWithValueTrue() error {
 	if !test.deleteResult {
 		return fmt.Errorf("event not deleted")
 	}
 	return nil
 }
 
-func (test *calendarGrpcTest) iCallDeleteNotExistingMethod() error {
+func (test *calendarGrpcTest) iSendRequestToDeleteMethodWithNotExistingEvent() error {
 	request := &event.DeleteRequest{Id: 2}
 	_, err := test.client.Delete(test.ctx, request)
 	if err != nil {
+		test.deleteNotExistsCode = getStatusCode(err)
 		test.deleteNotExists = false
 	}
 
 	return nil
 }
 
-func (test *calendarGrpcTest) theDeleteNotExistingResultShouldBeFail() error {
-	if test.deleteResult {
+func (test *calendarGrpcTest) theDeleteRequestResponseCodeShouldBeInternalError(code int) error {
+	if test.deleteNotExistsCode != code {
+		return fmt.Errorf("unexpected status code: %d != %d", test.addDuplicateCode, code)
+	}
+	return nil
+}
+
+func (test *calendarGrpcTest) theDeleteRequestResponseShouldBeWithValueFalse() error {
+	if test.deleteNotExists {
 		return fmt.Errorf("not existing event deleted")
 	}
 	return nil
@@ -242,29 +326,37 @@ func FeatureContextGrpc(s *godog.Suite) {
 
 	s.BeforeScenario(testGrpc.connect)
 
-	s.Step(`^I call add method$`, testGrpc.iCallAddMethod)
-	s.Step(`^Method should return success result$`, testGrpc.theAddResultShouldBeSuccess)
+	s.Step(`^I send request to add method$`, testGrpc.iSendRequestToAddMethod)
+	s.Step(`^The add request response code should be (\d+) \(ok\)$`, testGrpc.theAddRequestResponseCodeShouldBeOk)
+	s.Step(`^The add request response should be with value true$`, testGrpc.theAddRequestResponseShouldBeWithValueTrue)
 
-	s.Step(`^I call add method with existing event$`, testGrpc.iCallAddMethodWithExistingEvent)
-	s.Step(`^Method should return fail result$`, testGrpc.theAddWithExistingShouldReturnFailResult)
+	s.Step(`^I send request to add method with existing event$`, testGrpc.iSendRequestToAddMethodWithExistingEvent)
+	s.Step(`^The add request response code should be (\d+) \(internal error\)$`, testGrpc.theAddRequestResponseCodeShouldBeInternalError)
+	s.Step(`^The add request response should be with value false$`, testGrpc.theAddRequestResponseShouldBeWithValueFalse)
 
-	s.Step(`^I call list method$`, testGrpc.iCallListMethod)
-	s.Step(`^The result should be non empty$`, testGrpc.theListResultShouldBeNonEmpty)
+	s.Step(`^I send request to list method$`, testGrpc.iSendRequestToListMethod)
+	s.Step(`^The list request response code should be (\d+) \(ok\)$`, testGrpc.theListRequestResponseCodeShouldBeOk)
+	s.Step(`^The list request response should be non empty$`, testGrpc.theListRequestResponseShouldBeNonEmpty)
 
-	s.Step(`^I call search method$`, testGrpc.iCallSearchMethod)
-	s.Step(`^Method should return 1 event$`, testGrpc.theSearchResultShouldBeNonEmpty)
+	s.Step(`^I send request to search method$`, testGrpc.iSendRequestToSearchMethod)
+	s.Step(`^The search request response code should be (\d+) \(ok\)$`, testGrpc.theSearchRequestResponseCodeShouldBeOk)
+	s.Step(`^The search request response should contains (\d+) event$`, testGrpc.theSearchRequestResponseShouldContainsEvent)
 
-	s.Step(`^I call update method$`, testGrpc.iCallUpdateMethod)
-	s.Step(`^Method should return success result$`, testGrpc.theUpdateResultShouldBeSuccess)
+	s.Step(`^I send request to update method$`, testGrpc.iSendRequestToUpdateMethod)
+	s.Step(`^The update request response code should be (\d+) \(ok\)$`, testGrpc.theUpdateRequestResponseCodeShouldBeOk)
+	s.Step(`^The update request response should be with value true$`, testGrpc.theUpdateRequestResponseShouldBeWithValueTrue)
 
-	s.Step(`^I call update method with not existing event$`, testGrpc.iCallUpdateNotExistingMethod)
-	s.Step(`^Method should return fail result$`, testGrpc.theUpdateNotExistingResultShouldBeFail)
+	s.Step(`^I send request to update method with not existing event$`, testGrpc.iSendRequestToUpdateMethodWithNotExistingEvent)
+	s.Step(`^The update request response code should be (\d+) \(internal error\)$`, testGrpc.theUpdateRequestResponseCodeShouldBeInternalError)
+	s.Step(`^The update request response should be with value false$`, testGrpc.theUpdateRequestResponseShouldBeWithValueFalse)
 
-	s.Step(`^I call delete method$`, testGrpc.iCallDeleteMethod)
-	s.Step(`^Method should return success result$`, testGrpc.theDeleteResultShouldBeSuccess)
+	s.Step(`^I send request to delete method$`, testGrpc.iSendRequestToDeleteMethod)
+	s.Step(`^The delete request response code should be (\d+) \(ok\)$`, testGrpc.theDeleteRequestResponseCodeShouldBeOk)
+	s.Step(`^The delete request response should be with value true$`, testGrpc.theDeleteRequestResponseShouldBeWithValueTrue)
 
-	s.Step(`^I call delete method with not existing event$`, testGrpc.iCallDeleteNotExistingMethod)
-	s.Step(`^Method should return fail result$`, testGrpc.theDeleteNotExistingResultShouldBeFail)
+	s.Step(`^I send request to delete method with not existing event$`, testGrpc.iSendRequestToDeleteMethodWithNotExistingEvent)
+	s.Step(`^The delete request response code should be (\d+) \(internal error\)$`, testGrpc.theDeleteRequestResponseCodeShouldBeInternalError)
+	s.Step(`^The delete request response should be with value false$`, testGrpc.theDeleteRequestResponseShouldBeWithValueFalse)
 
 	s.AfterScenario(testGrpc.close)
 }
