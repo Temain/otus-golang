@@ -102,7 +102,7 @@ func (test *calendarGrpcTest) iSendRequestToAddMethod() error {
 
 func (test *calendarGrpcTest) theAddRequestResponseCodeShouldBeOk(code int) error {
 	if test.addCode != code {
-		return fmt.Errorf("unexpected status code: %d != %d", test.addDuplicateCode, code)
+		return fmt.Errorf("unexpected status code: %d != %d", test.addCode, code)
 	}
 	return nil
 }
@@ -168,7 +168,7 @@ func (test *calendarGrpcTest) iSendRequestToListMethod() error {
 
 func (test *calendarGrpcTest) theListRequestResponseCodeShouldBeOk(code int) error {
 	if test.listCode != code {
-		return fmt.Errorf("unexpected status code: %d != %d", test.addDuplicateCode, code)
+		return fmt.Errorf("unexpected status code: %d != %d", test.listCode, code)
 	}
 	return nil
 }
@@ -195,7 +195,7 @@ func (test *calendarGrpcTest) iSendRequestToSearchMethod() error {
 
 func (test *calendarGrpcTest) theSearchRequestResponseCodeShouldBeOk(code int) error {
 	if test.searchCode != code {
-		return fmt.Errorf("unexpected status code: %d != %d", test.addDuplicateCode, code)
+		return fmt.Errorf("unexpected status code: %d != %d", test.searchCode, code)
 	}
 	return nil
 }
@@ -222,7 +222,7 @@ func (test *calendarGrpcTest) iSendRequestToUpdateMethod() error {
 
 func (test *calendarGrpcTest) theUpdateRequestResponseCodeShouldBeOk(code int) error {
 	if test.updateCode != code {
-		return fmt.Errorf("unexpected status code: %d != %d", test.addDuplicateCode, code)
+		return fmt.Errorf("unexpected status code: %d != %d", test.updateCode, code)
 	}
 	return nil
 }
@@ -257,7 +257,7 @@ func (test *calendarGrpcTest) iSendRequestToUpdateMethodWithNotExistingEvent() e
 
 func (test *calendarGrpcTest) theUpdateRequestResponseCodeShouldBeInternalError(code int) error {
 	if test.updateNotExistsCode != code {
-		return fmt.Errorf("unexpected status code: %d != %d", test.addDuplicateCode, code)
+		return fmt.Errorf("unexpected status code: %d != %d", test.updateNotExistsCode, code)
 	}
 	return nil
 }
@@ -284,7 +284,7 @@ func (test *calendarGrpcTest) iSendRequestToDeleteMethod() error {
 
 func (test *calendarGrpcTest) theDeleteRequestResponseCodeShouldBeOk(code int) error {
 	if test.deleteCode != code {
-		return fmt.Errorf("unexpected status code: %d != %d", test.addDuplicateCode, code)
+		return fmt.Errorf("unexpected status code: %d != %d", test.deleteCode, code)
 	}
 	return nil
 }
@@ -309,7 +309,7 @@ func (test *calendarGrpcTest) iSendRequestToDeleteMethodWithNotExistingEvent() e
 
 func (test *calendarGrpcTest) theDeleteRequestResponseCodeShouldBeInternalError(code int) error {
 	if test.deleteNotExistsCode != code {
-		return fmt.Errorf("unexpected status code: %d != %d", test.addDuplicateCode, code)
+		return fmt.Errorf("unexpected status code: %d != %d", test.deleteNotExistsCode, code)
 	}
 	return nil
 }

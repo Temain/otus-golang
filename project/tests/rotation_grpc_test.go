@@ -61,7 +61,7 @@ func getStatusCode(err error) (code int) {
 
 func (test *rotationGrpcTest) iSendRequestToAddBannerMethod() error {
 	request := &proto.AddBannerRequest{}
-	response, err := test.client.AddBanner(test.ctx, request)
+	_, err := test.client.AddBanner(test.ctx, request)
 	if err != nil {
 		test.addBannerCode = getStatusCode(err)
 		return fmt.Errorf("error on add banner to rotation: %v", err)
@@ -72,8 +72,11 @@ func (test *rotationGrpcTest) iSendRequestToAddBannerMethod() error {
 	return nil
 }
 
-func (test *rotationGrpcTest) theAddBannerRequestResponseCodeShouldBeOk(arg1 int) error {
-	return godog.ErrPending
+func (test *rotationGrpcTest) theAddBannerRequestResponseCodeShouldBeOk(code int) error {
+	if test.addBannerCode != code {
+		return fmt.Errorf("unexpected status code: %d != %d", test.addBannerCode, code)
+	}
+	return nil
 }
 
 func (test *rotationGrpcTest) theAddBannerRequestResponseShouldBeWithValueTrue() error {
