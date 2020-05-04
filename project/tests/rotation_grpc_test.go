@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	proto "github.com/Temain/otus-golang/project/pkg/proto"
+	"github.com/Temain/otus-golang/project/pkg/proto"
 	"github.com/cucumber/godog"
 	"github.com/cucumber/messages-go/v10"
 	"google.golang.org/grpc"
@@ -17,7 +17,7 @@ var grpcListen = os.Getenv("TESTS_GRPC_API")
 
 func init() {
 	if grpcListen == "" {
-		grpcListen = "grpc_api:50051"
+		grpcListen = "grpc_api:50052"
 	}
 }
 
@@ -25,10 +25,10 @@ type rotationGrpcTest struct {
 	ctx        context.Context
 	clientConn *grpc.ClientConn
 	client     proto.RotationServiceClient
-	//sampleEvent        *event.EventMessage
-	//listResult         []event.EventMessage
-	//searchResult       *event.EventMessage
-	addResult          bool
+	// sampleEvent        *event.EventMessage
+	// listResult         []event.EventMessage
+	// searchResult       *event.EventMessage
+	// addResult          bool
 	addDuplicateResult bool
 	updateResult       bool
 	updateNotExists    bool
@@ -42,8 +42,8 @@ func (test *rotationGrpcTest) connect(*messages.Pickle) {
 	if err != nil {
 		log.Fatalf("could not connect: %v", err)
 	}
-	//test.client = proto.NewEventServiceClient(cc)
-	//test.clientConn = cc
+	test.client = proto.NewEventServiceClient(cc)
+	test.clientConn = cc
 	//
 	//sampleTime := time.Date(2020, 04, 22, 10, 00, 00, 00, time.UTC)
 	//created, err := ptypes.TimestampProto(sampleTime)

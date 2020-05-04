@@ -3,9 +3,9 @@ package main
 import (
 	"log"
 
-	"github.com/Temain/otus-golang/project/internal/api"
-
 	"github.com/spf13/pflag"
+
+	"github.com/Temain/otus-golang/project/internal/api"
 )
 
 var configPath string
