@@ -7,6 +7,8 @@ import (
 	"os"
 	"time"
 
+	"google.golang.org/grpc/status"
+
 	"github.com/cucumber/godog"
 	"github.com/cucumber/messages-go/v10"
 	"google.golang.org/grpc"
@@ -23,18 +25,11 @@ func init() {
 }
 
 type rotationGrpcTest struct {
-	ctx        context.Context
-	clientConn *grpc.ClientConn
-	client     proto.RotationServiceClient
-	//sampleEvent        *event.EventMessage
-	//listResult         []event.EventMessage
-	//searchResult       *event.EventMessage
-	//addResult          bool
-	//addDuplicateResult bool
-	//updateResult       bool
-	//updateNotExists    bool
-	//deleteResult       bool
-	//deleteNotExists    bool
+	ctx             context.Context
+	clientConn      *grpc.ClientConn
+	client          proto.RotationServiceClient
+	addBannerResult bool
+	addBannerCode   int
 }
 
 func (test *rotationGrpcTest) connect(*messages.Pickle) {
@@ -54,11 +49,34 @@ func (test *rotationGrpcTest) close(*messages.Pickle, error) {
 	}
 }
 
-func (test *rotationGrpcTest) iCallAddMethod() error {
+func getStatusCode(err error) (code int) {
+	statusErr, ok := status.FromError(err)
+	if ok {
+		code = int(statusErr.Code())
+	} else {
+		code = -1
+	}
+	return code
+}
+
+func (test *rotationGrpcTest) iSendRequestToAddBannerMethod() error {
+	request := &proto.AddBannerRequest{}
+	response, err := test.client.AddBanner(test.ctx, request)
+	if err != nil {
+		test.addBannerCode = getStatusCode(err)
+		return fmt.Errorf("error on add banner to rotation: %v", err)
+	}
+
+	// test.addBannerResult = response.Success
+
+	return nil
+}
+
+func (test *rotationGrpcTest) theAddBannerRequestResponseCodeShouldBeOk(arg1 int) error {
 	return godog.ErrPending
 }
 
-func (test *rotationGrpcTest) methodShouldReturnSuccessResult() error {
+func (test *rotationGrpcTest) theAddBannerRequestResponseShouldBeWithValueTrue() error {
 	return godog.ErrPending
 }
 
@@ -67,8 +85,9 @@ func FeatureContext(s *godog.Suite) {
 
 	s.BeforeScenario(testGrpc.connect)
 
-	s.Step(`^I call add method$`, testGrpc.iCallAddMethod)
-	s.Step(`^Method should return success result$`, testGrpc.methodShouldReturnSuccessResult)
+	s.Step(`^I send request to add banner method$`, testGrpc.iSendRequestToAddBannerMethod)
+	s.Step(`^The add banner request response code should be (\d+) \(ok\)$`, testGrpc.theAddBannerRequestResponseCodeShouldBeOk)
+	s.Step(`^The add banner request response should be with value true$`, testGrpc.theAddBannerRequestResponseShouldBeWithValueTrue)
 
 	s.AfterScenario(testGrpc.close)
 }

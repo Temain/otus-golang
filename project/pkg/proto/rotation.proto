@@ -14,7 +14,7 @@ message AddBannerRequest {
 }
 
 message AddBannerResponse {
-  BannerMessage banner = 1;
+  bool success = 1;
 }
 
 message DeleteBannerRequest {
