@@ -1,10 +1,9 @@
 version: "3.7"
 services:
-  grpc_api:
-    container_name: rotation_grpc-api
+  rotation_grpc_api:
     build:
       context: .
-      dockerfile: ./cmd/calendar_api/Dockerfile.grpc
+      dockerfile: ./cmd/rotation_api/Dockerfile
     restart: on-failure
     ports:
       - "50052:50052"

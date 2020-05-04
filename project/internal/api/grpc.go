@@ -25,8 +25,8 @@ type RotationServer struct {
 }
 
 func (s RotationServer) AddBanner(ctx context.Context, request *proto.AddBannerRequest) (*proto.AddBannerResponse, error) {
-	logr.Info("received list request")
-	response := &proto.AddBannerResponse{}
+	logr.Info("received add request")
+	response := &proto.AddBannerResponse{Success: true}
 	return response, nil
 }
 

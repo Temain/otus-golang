@@ -4,14 +4,13 @@ services:
     build: tests
     command: "true"
     links:
-      - grpc_api
+      - rotation_grpc_api
     environment:
-      TESTS_GRPC_LISTEN: "grpc_api:50052"
+      TESTS_GRPC_LISTEN: "rotation_grpc-api:50052"
     networks:
       - rotation
 
-  grpc_api:
-    container_name: rotation_grpc-api
+  rotation_grpc_api:
     build:
       context: .
       dockerfile: ./cmd/rotation_api/Dockerfile
@@ -23,24 +22,23 @@ services:
     depends_on:
       - postgres
     environment:
-      POSTGRES_DSN: "postgres://postgres:123456789@postgres:5433/banner_rotation"
+      POSTGRES_DSN: "postgres://postgres:123456789@postgres:5432/banner_rotation"
 
   postgres:
-    container_name: postgres_rotation
+    container_name: postgres
     image: postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123456789
       POSTGRES_DB: banner_rotation
     ports:
-      - "5433:5432"
+      - "5432:5432"
     networks:
       - rotation
     volumes:
       - ./sql/init.sql:/docker-entrypoint-initdb.d/setup.sql
 
   rabbit:
-    container_name: rabbit_rotation
     image: rabbitmq:3.7.17-management
     ports:
       - "15672:15672"

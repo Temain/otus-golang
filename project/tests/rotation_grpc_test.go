@@ -7,11 +7,10 @@ import (
 	"os"
 	"time"
 
-	"google.golang.org/grpc/status"
-
 	"github.com/cucumber/godog"
 	"github.com/cucumber/messages-go/v10"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
 
 	"github.com/Temain/otus-golang/project/pkg/proto"
 )
@@ -20,7 +19,7 @@ var grpcListen = os.Getenv("TESTS_GRPC_API")
 
 func init() {
 	if grpcListen == "" {
-		grpcListen = "grpc_api:50052"
+		grpcListen = "rotation_grpc_api:50052"
 	}
 }
 
@@ -61,13 +60,13 @@ func getStatusCode(err error) (code int) {
 
 func (test *rotationGrpcTest) iSendRequestToAddBannerMethod() error {
 	request := &proto.AddBannerRequest{}
-	_, err := test.client.AddBanner(test.ctx, request)
+	response, err := test.client.AddBanner(test.ctx, request)
 	if err != nil {
 		test.addBannerCode = getStatusCode(err)
 		return fmt.Errorf("error on add banner to rotation: %v", err)
 	}
 
-	// test.addBannerResult = response.Success
+	test.addBannerResult = response.Success
 
 	return nil
 }
