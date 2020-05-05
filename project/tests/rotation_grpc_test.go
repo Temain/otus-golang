@@ -65,7 +65,7 @@ func getStatusCode(err error) (code int) {
 }
 
 func (test *rotationGrpcTest) iSendRequestToAddBannerMethod() error {
-	request := &proto.AddBannerRequest{}
+	request := &proto.AddBannerRequest{BannerId: 1, SlotId: 1}
 	response, err := test.client.AddBanner(test.ctx, request)
 	if err != nil {
 		test.addBannerCode = getStatusCode(err)
@@ -92,7 +92,7 @@ func (test *rotationGrpcTest) theAddBannerRequestResponseShouldBeWithValueTrue()
 }
 
 func (test *rotationGrpcTest) iSendRequestToDeleteBannerMethod() error {
-	request := &proto.DeleteBannerRequest{}
+	request := &proto.DeleteBannerRequest{BannerId: 1, SlotId: 1}
 	response, err := test.client.DeleteBanner(test.ctx, request)
 	if err != nil {
 		test.deleteBannerCode = getStatusCode(err)

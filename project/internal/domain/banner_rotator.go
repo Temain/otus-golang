@@ -41,7 +41,7 @@ func (r *BannerRotator) Add(ctx context.Context, bannerId int64, slotId int64) e
 	}
 	err = r.rotationStorage.Add(ctx, item)
 	if err != nil {
-		return fmt.Errorf("error on add banner %d in rotation for slot %d", bannerId, slotId)
+		return fmt.Errorf("error on add banner %d in rotation for slot %d: %v", bannerId, slotId, err)
 	}
 
 	return nil
@@ -53,18 +53,22 @@ func (r *BannerRotator) Delete(ctx context.Context, bannerId int64, slotId int64
 		return err
 	}
 	if event == nil {
-		return fmt.Errorf("banner %d not found in rotation for slot %d", bannerId, slotId)
+		return fmt.Errorf("banner %d not found in rotation for slot %d: %v", bannerId, slotId, err)
 	}
 
 	err = r.rotationStorage.Delete(ctx, bannerId, slotId)
 	if err != nil {
-		return fmt.Errorf("error on delete banner %v from rotation for slot %d", bannerId, slotId)
+		return fmt.Errorf("error on delete banner %d from rotation for slot %d: %v", bannerId, slotId, err)
 	}
 
 	return nil
 }
 
 func (r *BannerRotator) Click(ctx context.Context, bannerId int64, slotId int64, groupId int64) error {
+	panic("implement me")
+}
+
+func (r *BannerRotator) Buyout(ctx context.Context, bannerId int64, slotId int64, groupId int64) error {
 	panic("implement me")
 }
 

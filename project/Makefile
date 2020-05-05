@@ -6,13 +6,13 @@ build:
 run-api:
 	go run $(PATH_API) --config=configs/config.json
 
-up:
+run:
 	docker-compose up -d --build
 
-down:
+stop:
 	docker-compose down
 
-restart: down up
+restart: stop run
 
 test:
 	set -e ;\

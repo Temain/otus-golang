@@ -6,6 +6,9 @@ import (
 	"log"
 	"net"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -21,17 +24,32 @@ import (
 var logr *logrus.Logger
 
 type RotationServer struct {
-	Rotator interfaces.Rotator
+	rotator interfaces.Rotator
 }
 
 func (s RotationServer) AddBanner(ctx context.Context, request *proto.AddBannerRequest) (*proto.AddBannerResponse, error) {
 	logr.Info("received add request")
 	response := &proto.AddBannerResponse{}
+	err := s.rotator.Add(ctx, request.BannerId, request.SlotId)
+	if err != nil {
+		return response, status.Error(codes.Internal, fmt.Sprintf("error on add: %v", err))
+	}
+
+	response.Success = true
+
 	return response, nil
 }
 
 func (s RotationServer) DeleteBanner(ctx context.Context, request *proto.DeleteBannerRequest) (*proto.DeleteBannerResponse, error) {
+	logr.Info("received delete request")
 	response := &proto.DeleteBannerResponse{}
+	err := s.rotator.Delete(ctx, request.BannerId, request.SlotId)
+	if err != nil {
+		return response, status.Error(codes.Internal, fmt.Sprintf("error on delete: %v", err))
+	}
+
+	response.Success = true
+
 	return response, nil
 }
 
@@ -70,7 +88,7 @@ func StartGrpcServer(configPath string) error {
 	}
 	log.Println("connected to database")
 
-	rotationServer := &RotationServer{Rotator: rotator}
+	rotationServer := &RotationServer{rotator: rotator}
 	proto.RegisterRotationServiceServer(grpcServer, rotationServer)
 	err = grpcServer.Serve(listen)
 	if err != nil {

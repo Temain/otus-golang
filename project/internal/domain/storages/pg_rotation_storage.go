@@ -26,7 +26,7 @@ func NewPgRotationStorage(db *sqlx.DB) (interfaces.RotationStorage, error) {
 
 func (pc *PgRotationStorage) List(ctx context.Context) ([]entities.Rotation, error) {
 	query := `
-		SELECT id, title FROM rotation
+		SELECT banner_id, slot_id, started_at FROM rotation
 	`
 
 	var list []entities.Rotation
@@ -58,7 +58,7 @@ func (pc *PgRotationStorage) Get(ctx context.Context, bannerId int64, slotId int
 	query := `
 		SELECT banner_id, slot_id, started_at 
 		FROM rotation 
-		WHERE bannerId = $1 and slotId = $2 
+		WHERE banner_id = $1 and slot_id = $2 
 	`
 
 	var item entities.Rotation
@@ -76,7 +76,7 @@ func (pc *PgRotationStorage) Get(ctx context.Context, bannerId int64, slotId int
 func (pc *PgRotationStorage) Add(ctx context.Context, item *entities.Rotation) error {
 	query := `
 		INSERT INTO rotation(banner_id, slot_id, started_at)
-		VALUES (:bannerId, :slotId, :startedAt)
+		VALUES (:banner_id, :slot_id, :started_at)
 	`
 	_, err := pc.db.NamedExecContext(ctx, query, item)
 	if err != nil {
@@ -106,7 +106,7 @@ func (pc *PgRotationStorage) Delete(ctx context.Context, bannerId int64, slotId 
 	query := `
 		DELETE 
 		FROM rotation
-		where bannerId = $1 and slotId = $2 
+		where banner_id = $1 and slot_id = $2 
 	`
 	_, err := pc.db.ExecContext(ctx, query, bannerId, slotId)
 	if err != nil {
