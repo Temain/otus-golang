@@ -1,6 +1,6 @@
 package entities
 
 type Slot struct {
-	Id    int
+	Id    int64
 	Title string
 }

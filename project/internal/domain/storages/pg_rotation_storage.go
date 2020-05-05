@@ -54,15 +54,15 @@ func (pc *PgRotationStorage) ListBySlot(ctx context.Context, slotId int64) ([]en
 	return list, nil
 }
 
-func (pc *PgRotationStorage) Get(ctx context.Context, id int64) (*entities.Rotation, error) {
+func (pc *PgRotationStorage) Get(ctx context.Context, bannerId int64, slotId int64) (*entities.Rotation, error) {
 	query := `
 		SELECT banner_id, slot_id, started_at 
 		FROM rotation 
-		WHERE id = $1 
+		WHERE bannerId = $1 and slotId = $2 
 	`
 
 	var item entities.Rotation
-	err := pc.db.GetContext(ctx, &item, query, id)
+	err := pc.db.GetContext(ctx, &item, query, bannerId, slotId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -102,13 +102,13 @@ func (pc *PgRotationStorage) Update(ctx context.Context, item *entities.Rotation
 	return nil
 }
 
-func (pc *PgRotationStorage) Delete(ctx context.Context, id int64) error {
+func (pc *PgRotationStorage) Delete(ctx context.Context, bannerId int64, slotId int64) error {
 	query := `
 		DELETE 
 		FROM rotation
-		where id = $1
+		where bannerId = $1 and slotId = $2 
 	`
-	_, err := pc.db.ExecContext(ctx, query, id)
+	_, err := pc.db.ExecContext(ctx, query, bannerId, slotId)
 	if err != nil {
 		return err
 	}

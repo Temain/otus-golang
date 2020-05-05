@@ -3,7 +3,7 @@ package entities
 import "time"
 
 type Rotation struct {
-	BannerId  int
-	SlotId    int
+	BannerId  int64
+	SlotId    int64
 	StartedAt time.Time
 }

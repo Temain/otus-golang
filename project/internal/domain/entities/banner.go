@@ -1,6 +1,6 @@
 package entities
 
 type Banner struct {
-	Id    int
+	Id    int64
 	Title string
 }

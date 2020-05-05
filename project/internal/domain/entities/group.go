@@ -1,6 +1,6 @@
 package entities
 
 type Group struct {
-	Id    int
+	Id    int64
 	Title string
 }
