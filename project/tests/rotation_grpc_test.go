@@ -24,11 +24,17 @@ func init() {
 }
 
 type rotationGrpcTest struct {
-	ctx             context.Context
-	clientConn      *grpc.ClientConn
-	client          proto.RotationServiceClient
-	addBannerResult bool
-	addBannerCode   int
+	ctx                context.Context
+	clientConn         *grpc.ClientConn
+	client             proto.RotationServiceClient
+	addBannerResult    bool
+	addBannerCode      int
+	deleteBannerResult bool
+	deleteBannerCode   int
+	clickBannerResult  bool
+	clickBannerCode    int
+	getBannerResult    int64
+	getBannerCode      int
 }
 
 func (test *rotationGrpcTest) connect(*messages.Pickle) {
@@ -79,7 +85,91 @@ func (test *rotationGrpcTest) theAddBannerRequestResponseCodeShouldBeOk(code int
 }
 
 func (test *rotationGrpcTest) theAddBannerRequestResponseShouldBeWithValueTrue() error {
-	return godog.ErrPending
+	if !test.addBannerResult {
+		return fmt.Errorf("banner not added to rotation")
+	}
+	return nil
+}
+
+func (test *rotationGrpcTest) iSendRequestToDeleteBannerMethod() error {
+	request := &proto.DeleteBannerRequest{}
+	response, err := test.client.DeleteBanner(test.ctx, request)
+	if err != nil {
+		test.deleteBannerCode = getStatusCode(err)
+		return fmt.Errorf("error on delete banner from rotation: %v", err)
+	}
+
+	test.deleteBannerResult = response.Success
+
+	return nil
+}
+
+func (test *rotationGrpcTest) theDeleteBannerRequestResponseCodeShouldBeOk(code int) error {
+	if test.deleteBannerCode != code {
+		return fmt.Errorf("unexpected status code: %d != %d", test.deleteBannerCode, code)
+	}
+	return nil
+}
+
+func (test *rotationGrpcTest) theDeleteBannerRequestResponseShouldBeWithValueTrue() error {
+	if !test.deleteBannerResult {
+		return fmt.Errorf("banner not deleted from rotation")
+	}
+	return nil
+}
+
+func (test *rotationGrpcTest) iSendRequestToClickBannerMethod() error {
+	request := &proto.ClickBannerRequest{}
+	response, err := test.client.ClickBanner(test.ctx, request)
+	if err != nil {
+		test.deleteBannerCode = getStatusCode(err)
+		return fmt.Errorf("error on click banner: %v", err)
+	}
+
+	test.clickBannerResult = response.Success
+
+	return nil
+}
+
+func (test *rotationGrpcTest) theClickBannerRequestResponseCodeShouldBeOk(code int) error {
+	if test.clickBannerCode != code {
+		return fmt.Errorf("unexpected status code: %d != %d", test.clickBannerCode, code)
+	}
+	return nil
+}
+
+func (test *rotationGrpcTest) theClickBannerRequestResponseShouldBeWithValueTrue() error {
+	if !test.clickBannerResult {
+		return fmt.Errorf("error on click banner")
+	}
+	return nil
+}
+
+func (test *rotationGrpcTest) iSendRequestToGetBannerMethod() error {
+	request := &proto.GetBannerRequest{}
+	response, err := test.client.GetBanner(test.ctx, request)
+	if err != nil {
+		test.deleteBannerCode = getStatusCode(err)
+		return fmt.Errorf("error on get banner: %v", err)
+	}
+
+	test.getBannerResult = response.BannerId
+
+	return nil
+}
+
+func (test *rotationGrpcTest) theGetBannerRequestResponseCodeShouldBeOk(code int) error {
+	if test.getBannerCode != code {
+		return fmt.Errorf("unexpected status code: %d != %d", test.getBannerCode, code)
+	}
+	return nil
+}
+
+func (test *rotationGrpcTest) theGetBannerRequestResponseShouldBeNot(arg1 int) error {
+	if test.getBannerResult == 0 {
+		return fmt.Errorf("wrong get banner result, must be non zero")
+	}
+	return nil
 }
 
 func FeatureContext(s *godog.Suite) {
@@ -90,6 +180,18 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^I send request to add banner method$`, testGrpc.iSendRequestToAddBannerMethod)
 	s.Step(`^The add banner request response code should be (\d+) \(ok\)$`, testGrpc.theAddBannerRequestResponseCodeShouldBeOk)
 	s.Step(`^The add banner request response should be with value true$`, testGrpc.theAddBannerRequestResponseShouldBeWithValueTrue)
+
+	s.Step(`^I send request to delete banner method$`, testGrpc.iSendRequestToDeleteBannerMethod)
+	s.Step(`^The delete banner request response code should be (\d+) \(ok\)$`, testGrpc.theDeleteBannerRequestResponseCodeShouldBeOk)
+	s.Step(`^The delete banner request response should be with value true$`, testGrpc.theDeleteBannerRequestResponseShouldBeWithValueTrue)
+
+	s.Step(`^I send request to click banner method$`, testGrpc.iSendRequestToClickBannerMethod)
+	s.Step(`^The click banner request response code should be (\d+) \(ok\)$`, testGrpc.theClickBannerRequestResponseCodeShouldBeOk)
+	s.Step(`^The click banner request response should be with value true$`, testGrpc.theClickBannerRequestResponseShouldBeWithValueTrue)
+
+	s.Step(`^I send request to get banner method$`, testGrpc.iSendRequestToGetBannerMethod)
+	s.Step(`^The get banner request response code should be (\d+) \(ok\)$`, testGrpc.theGetBannerRequestResponseCodeShouldBeOk)
+	s.Step(`^The get banner request response should be not (\d+)$`, testGrpc.theGetBannerRequestResponseShouldBeNot)
 
 	s.AfterScenario(testGrpc.close)
 }
