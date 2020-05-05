@@ -5,15 +5,19 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Temain/otus-golang/project/internal/domain/entities"
+	"github.com/Temain/otus-golang/project/pkg/algorithm"
 
 	"github.com/jmoiron/sqlx"
 
+	"github.com/Temain/otus-golang/project/internal/domain/entities"
 	"github.com/Temain/otus-golang/project/internal/domain/interfaces"
 	"github.com/Temain/otus-golang/project/internal/domain/storages"
+	alg_ent "github.com/Temain/otus-golang/project/pkg/algorithm/entities"
+	alg_interf "github.com/Temain/otus-golang/project/pkg/algorithm/interfaces"
 )
 
 type BannerRotator struct {
+	algorithm       alg_interf.RotationAlgorithm
 	rotationStorage interfaces.RotationStorage
 }
 
@@ -22,7 +26,11 @@ func NewBannerRotator(db *sqlx.DB) (interfaces.Rotator, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to create rotation storage: %v", err)
 	}
-	return &BannerRotator{rotationStorage: storage}, nil
+	algorithm, err := algorithm.NewMultiarmedBandit()
+	if err != nil {
+		return nil, fmt.Errorf("error on init rotation algorithm")
+	}
+	return &BannerRotator{rotationStorage: storage, algorithm: algorithm}, nil
 }
 
 func (r *BannerRotator) Add(ctx context.Context, bannerId int64, slotId int64) error {
@@ -73,5 +81,6 @@ func (r *BannerRotator) Buyout(ctx context.Context, bannerId int64, slotId int64
 }
 
 func (r *BannerRotator) Get(ctx context.Context, slotId int64, groupId int64) (int64, error) {
-	panic("implement me")
+	var data []alg_ent.AlgorithmData
+	return r.algorithm.GetHandle(data)
 }
