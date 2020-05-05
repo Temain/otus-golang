@@ -7,6 +7,6 @@ import (
 )
 
 type StatisticsStorage interface {
-	// List(ctx context.Context, typeId int64, bannerId int64, slotId int64, groupId int64) ([]entities.Statistics, error)
+	SummaryBySlotAndGroup(ctx context.Context, slotId int64, groupId int64) ([]entities.StatisticsSummary, error)
 	Add(ctx context.Context, item *entities.Statistics) error
 }

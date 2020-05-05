@@ -40,8 +40,16 @@ CREATE TABLE public.rotation (
 	CONSTRAINT rotation_fk FOREIGN KEY (banner_id) REFERENCES public.banners(id),
 	CONSTRAINT rotation_fk_2 FOREIGN KEY (slot_id) REFERENCES public.slots(id)
 );
-
 CREATE INDEX rotation_banner_id_idx ON public.rotation (banner_id,slot_id);
+
+INSERT INTO public.rotation (banner_id,slot_id,started_at) VALUES
+(1,1,'2020-05-01 00:00:00.000'),
+(2,1,'2020-05-01 00:00:00.000'),
+(3,1,'2020-05-01 00:00:00.000'),
+(2,2,'2020-05-01 00:00:00.000'),
+(3,2,'2020-05-01 00:00:00.000'),
+(3,3,'2020-05-01 00:00:00.000')
+;
 
 
 CREATE TABLE public.statistics_type (
@@ -67,4 +75,20 @@ CREATE TABLE public."statistics" (
 );
 CREATE INDEX statistics_group_id_idx ON public."statistics" (type_id,banner_id,slot_id,group_id);
 
+INSERT INTO public."statistics" (type_id,banner_id,slot_id,group_id,date_time) VALUES
+(1,1,1,1,'2020-05-01 00:00:01.000'),
+(1,2,1,1,'2020-05-01 00:00:02.000'),
+(1,2,1,1,'2020-05-01 00:00:03.000'),
+(1,2,1,1,'2020-05-01 00:00:04.000'),
+(1,3,1,1,'2020-05-01 00:00:05.000'),
+(1,3,1,1,'2020-05-01 00:00:06.000'),
+(2,2,1,1,'2020-05-01 00:00:07.000'),
+(1,1,1,2,'2020-05-01 00:00:01.000'),
+(1,1,1,2,'2020-05-01 00:00:02.000'),
+(1,1,1,2,'2020-05-01 00:00:03.000'),
+(1,2,1,2,'2020-05-01 00:00:04.000'),
+(1,3,1,2,'2020-05-01 00:00:05.000'),
+(1,1,1,2,'2020-05-01 00:00:06.000'),
+(2,1,1,2,'2020-05-01 00:00:07.000')
+;
 
