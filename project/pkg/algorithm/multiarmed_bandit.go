@@ -21,10 +21,12 @@ func (mb *MultiarmedBandit) GetHandle(items []entities.AlgorithmData) (int64, er
 		countTotal += item.Count
 	}
 
+	fmt.Printf("total count: %v\n", countTotal)
+
 	var handleId int64
 	var maxResult float64
 	for _, item := range items {
-		result := float64(item.AvgIncome) + math.Sqrt(2*math.Log(2)/float64(countTotal))
+		result := float64(item.AvgIncome) + math.Sqrt((2*math.Log(float64(countTotal)))/float64(item.Count))
 		if result > maxResult {
 			maxResult = result
 			handleId = item.HandleId
