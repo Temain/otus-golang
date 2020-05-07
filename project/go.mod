@@ -3,6 +3,7 @@ module github.com/Temain/otus-golang/project
 go 1.14
 
 require (
+	github.com/Temain/otus-golang/project/pkg/algorithm v0.0.0-20200505154543-0ed659742212
 	github.com/cockroachdb/apd v1.1.0 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/golang/protobuf v1.4.0

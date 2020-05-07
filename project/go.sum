@@ -13,6 +13,9 @@ github.com/SermoDigital/jose v0.9.1/go.mod h1:ARgCUhI1MHQH+ONky/PAtmVHQrP5JlGY0F
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
 github.com/Temain/otus-golang v0.0.0-20200505150450-4757ce686e06 h1:Omeip6l2lf3X23T0ZH/tONiVH7YPB/uU5MAa+qnwWok=
+github.com/Temain/otus-golang v0.0.0-20200505154543-0ed659742212 h1:HEIIiDSu2A5gEiVDz3Wulnzyg+QtCeroSnwdfCgFJ4I=
+github.com/Temain/otus-golang/project/pkg/algorithm v0.0.0-20200505154543-0ed659742212 h1:sAdwounW25JkXE9LGlnx5pjlsUh56GpnoUb5INaFIU0=
+github.com/Temain/otus-golang/project/pkg/algorithm v0.0.0-20200505154543-0ed659742212/go.mod h1:AbNtFO+qAwNgX7Ok2yp/pUoC71Y9kyzNBeKOZstAYFY=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
 github.com/apache/thrift v0.12.0/go.mod h1:cp2SuWMxlEZw2r+iP2GNCdIi4C1qmUzdZFSVb+bacwQ=

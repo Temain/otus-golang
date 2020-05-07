@@ -7,6 +7,7 @@ INSERT INTO public.banners (title) VALUES
 ('Баннер 1')
 ,('Баннер 2')
 ,('Баннер 3')
+,('Баннер 4')
 ;
 
 
@@ -68,10 +69,9 @@ CREATE TABLE public."statistics" (
 	slot_id int NOT NULL,
 	group_id int NOT NULL,
 	date_time timestamp NOT NULL,
-	CONSTRAINT statistics_fk FOREIGN KEY (type_id) REFERENCES public.statistics_type(id),
-	CONSTRAINT statistics_fk_1 FOREIGN KEY (banner_id) REFERENCES public.banners(id),
-	CONSTRAINT statistics_fk_2 FOREIGN KEY (slot_id) REFERENCES public.slots(id),
-	CONSTRAINT statistics_fk_3 FOREIGN KEY (group_id) REFERENCES public."groups"(id)
+	CONSTRAINT statistics_fk_type FOREIGN KEY (type_id) REFERENCES public.statistics_type(id),
+	CONSTRAINT statistics_fk_slot FOREIGN KEY (slot_id) REFERENCES public.slots(id),
+	CONSTRAINT statistics_fk_group FOREIGN KEY (group_id) REFERENCES public."groups"(id)
 );
 CREATE INDEX statistics_group_id_idx ON public."statistics" (type_id,banner_id,slot_id,group_id);
 

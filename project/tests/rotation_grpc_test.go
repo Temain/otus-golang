@@ -65,7 +65,7 @@ func getStatusCode(err error) (code int) {
 }
 
 func (test *rotationGrpcTest) iSendRequestToAddBannerMethod() error {
-	request := &proto.AddBannerRequest{BannerId: 1, SlotId: 1}
+	request := &proto.AddBannerRequest{BannerId: 4, SlotId: 1}
 	response, err := test.client.AddBanner(test.ctx, request)
 	if err != nil {
 		test.addBannerCode = getStatusCode(err)
@@ -92,7 +92,7 @@ func (test *rotationGrpcTest) theAddBannerRequestResponseShouldBeWithValueTrue()
 }
 
 func (test *rotationGrpcTest) iSendRequestToDeleteBannerMethod() error {
-	request := &proto.DeleteBannerRequest{BannerId: 1, SlotId: 1}
+	request := &proto.DeleteBannerRequest{BannerId: 4, SlotId: 1}
 	response, err := test.client.DeleteBanner(test.ctx, request)
 	if err != nil {
 		test.deleteBannerCode = getStatusCode(err)
@@ -119,7 +119,7 @@ func (test *rotationGrpcTest) theDeleteBannerRequestResponseShouldBeWithValueTru
 }
 
 func (test *rotationGrpcTest) iSendRequestToClickBannerMethod() error {
-	request := &proto.ClickBannerRequest{}
+	request := &proto.ClickBannerRequest{BannerId: 1, SlotId: 1, GroupId: 1}
 	response, err := test.client.ClickBanner(test.ctx, request)
 	if err != nil {
 		test.deleteBannerCode = getStatusCode(err)
@@ -146,7 +146,7 @@ func (test *rotationGrpcTest) theClickBannerRequestResponseShouldBeWithValueTrue
 }
 
 func (test *rotationGrpcTest) iSendRequestToGetBannerMethod() error {
-	request := &proto.GetBannerRequest{}
+	request := &proto.GetBannerRequest{SlotId: 1, GroupId: 1}
 	response, err := test.client.GetBanner(test.ctx, request)
 	if err != nil {
 		test.deleteBannerCode = getStatusCode(err)
@@ -181,13 +181,13 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^The add banner request response code should be (\d+) \(ok\)$`, testGrpc.theAddBannerRequestResponseCodeShouldBeOk)
 	s.Step(`^The add banner request response should be with value true$`, testGrpc.theAddBannerRequestResponseShouldBeWithValueTrue)
 
-	s.Step(`^I send request to delete banner method$`, testGrpc.iSendRequestToDeleteBannerMethod)
-	s.Step(`^The delete banner request response code should be (\d+) \(ok\)$`, testGrpc.theDeleteBannerRequestResponseCodeShouldBeOk)
-	s.Step(`^The delete banner request response should be with value true$`, testGrpc.theDeleteBannerRequestResponseShouldBeWithValueTrue)
-
 	s.Step(`^I send request to click banner method$`, testGrpc.iSendRequestToClickBannerMethod)
 	s.Step(`^The click banner request response code should be (\d+) \(ok\)$`, testGrpc.theClickBannerRequestResponseCodeShouldBeOk)
 	s.Step(`^The click banner request response should be with value true$`, testGrpc.theClickBannerRequestResponseShouldBeWithValueTrue)
+
+	s.Step(`^I send request to delete banner method$`, testGrpc.iSendRequestToDeleteBannerMethod)
+	s.Step(`^The delete banner request response code should be (\d+) \(ok\)$`, testGrpc.theDeleteBannerRequestResponseCodeShouldBeOk)
+	s.Step(`^The delete banner request response should be with value true$`, testGrpc.theDeleteBannerRequestResponseShouldBeWithValueTrue)
 
 	s.Step(`^I send request to get banner method$`, testGrpc.iSendRequestToGetBannerMethod)
 	s.Step(`^The get banner request response code should be (\d+) \(ok\)$`, testGrpc.theGetBannerRequestResponseCodeShouldBeOk)

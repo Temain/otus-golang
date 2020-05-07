@@ -36,7 +36,6 @@ func (s RotationServer) AddBanner(ctx context.Context, request *proto.AddBannerR
 	}
 
 	response.Success = true
-
 	return response, nil
 }
 
@@ -49,17 +48,38 @@ func (s RotationServer) DeleteBanner(ctx context.Context, request *proto.DeleteB
 	}
 
 	response.Success = true
-
 	return response, nil
 }
 
 func (s RotationServer) ClickBanner(ctx context.Context, request *proto.ClickBannerRequest) (*proto.ClickBannerResponse, error) {
 	response := &proto.ClickBannerResponse{}
+	err := s.rotator.Click(ctx, request.BannerId, request.SlotId, request.GroupId)
+	if err != nil {
+		return response, status.Error(codes.Internal, fmt.Sprintf("error on click: %v", err))
+	}
+
+	response.Success = true
 	return response, nil
 }
 
 func (s RotationServer) GetBanner(ctx context.Context, request *proto.GetBannerRequest) (*proto.GetBannerResponse, error) {
 	response := &proto.GetBannerResponse{}
+
+	bannerId, err := s.rotator.Get(ctx, request.SlotId, request.GroupId)
+	if err != nil {
+		return response, status.Error(codes.Internal, fmt.Sprintf("error on get banner: %v", err))
+	}
+	if bannerId == 0 {
+		return response, status.Error(codes.Internal, fmt.Sprintf("error on get banner: banner id is 0"))
+	}
+
+	err = s.rotator.Buyout(ctx, bannerId, request.SlotId, request.GroupId)
+	if err != nil {
+		return response, status.Error(codes.Internal, fmt.Sprintf("error on click: %v", err))
+	}
+
+	response.BannerId = bannerId
+
 	return response, nil
 }
 
