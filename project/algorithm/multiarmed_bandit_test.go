@@ -3,7 +3,7 @@ package algorithm
 import (
 	"testing"
 
-	"github.com/Temain/otus-golang/project/pkg/algorithm/entities"
+	"github.com/Temain/otus-golang/project/algorithm/entities"
 )
 
 func TestGetHandle(t *testing.T) {

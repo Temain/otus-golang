@@ -9,12 +9,12 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
+	alg_entities "github.com/Temain/otus-golang/project/algorithm/entities"
+	alg_interfaces "github.com/Temain/otus-golang/project/algorithm/interfaces"
 	"github.com/Temain/otus-golang/project/internal/domain/entities"
 	"github.com/Temain/otus-golang/project/internal/domain/interfaces"
 	"github.com/Temain/otus-golang/project/internal/domain/storages"
 	"github.com/Temain/otus-golang/project/pkg/algorithm"
-	alg_entities "github.com/Temain/otus-golang/project/pkg/algorithm/entities"
-	alg_interfaces "github.com/Temain/otus-golang/project/pkg/algorithm/interfaces"
 )
 
 type BannerRotator struct {

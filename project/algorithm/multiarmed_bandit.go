@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/Temain/otus-golang/project/pkg/algorithm/entities"
-	"github.com/Temain/otus-golang/project/pkg/algorithm/interfaces"
+	"github.com/Temain/otus-golang/project/algorithm/entities"
+	"github.com/Temain/otus-golang/project/algorithm/interfaces"
 )
 
 type MultiarmedBandit struct {
