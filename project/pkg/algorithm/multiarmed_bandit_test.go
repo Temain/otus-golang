@@ -45,3 +45,19 @@ func TestGetHandleInit(t *testing.T) {
 		t.Fatalf("bad result, handle id can't be 0")
 	}
 }
+
+func TestGetHandleNoItems(t *testing.T) {
+	algorithm, err := NewMultiarmedBandit()
+	if err != nil {
+		t.Fatalf("error on init algorithm: %v", err)
+	}
+
+	var data []entities.AlgorithmData
+	handleId, err := algorithm.GetHandle(data)
+	if err == nil {
+		t.Fatalf("bad result, with no data shound be error")
+	}
+	if handleId != 0 {
+		t.Fatalf("bad result, handle id should be 0")
+	}
+}

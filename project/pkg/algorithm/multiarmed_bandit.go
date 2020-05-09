@@ -16,8 +16,15 @@ func NewMultiarmedBandit() (interfaces.RotationAlgorithm, error) {
 }
 
 func (mb *MultiarmedBandit) GetHandle(items []entities.AlgorithmData) (int64, error) {
+	if len(items) == 0 {
+		return 0, fmt.Errorf("wrong data")
+	}
+
 	var countTotal int64
 	for _, item := range items {
+		if item.Count == 0 {
+			return item.HandleId, nil
+		}
 		countTotal += item.Count
 	}
 
