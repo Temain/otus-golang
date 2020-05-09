@@ -9,16 +9,16 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	alg_entities "github.com/Temain/otus-golang/project/algorithm/entities"
-	alg_interfaces "github.com/Temain/otus-golang/project/algorithm/interfaces"
+	"github.com/Temain/otus-golang/project/algorithm"
+	algentities "github.com/Temain/otus-golang/project/algorithm/entities"
+	alginterfaces "github.com/Temain/otus-golang/project/algorithm/interfaces"
 	"github.com/Temain/otus-golang/project/internal/domain/entities"
 	"github.com/Temain/otus-golang/project/internal/domain/interfaces"
 	"github.com/Temain/otus-golang/project/internal/domain/storages"
-	"github.com/Temain/otus-golang/project/pkg/algorithm"
 )
 
 type BannerRotator struct {
-	algorithm        alg_interfaces.RotationAlgorithm
+	algorithm        alginterfaces.RotationAlgorithm
 	bannerStorage    interfaces.BannerStorage
 	slotStorage      interfaces.SlotStorage
 	groupStorage     interfaces.GroupStorage
@@ -35,6 +35,11 @@ func NewBannerRotator(db *sqlx.DB) (interfaces.Rotator, error) {
 	slotStorage, err := storages.NewPgSlotStorage(db)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create slot storage: %v", err)
+	}
+
+	groupStorage, err := storages.NewPgGroupStorage(db)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create group storage: %v", err)
 	}
 
 	rotationStorage, err := storages.NewPgRotationStorage(db)
@@ -55,6 +60,7 @@ func NewBannerRotator(db *sqlx.DB) (interfaces.Rotator, error) {
 	rotator := &BannerRotator{
 		bannerStorage:    bannerStorage,
 		slotStorage:      slotStorage,
+		groupStorage:     groupStorage,
 		rotationStorage:  rotationStorage,
 		statisticStorage: statisticStorage,
 		algorithm:        algorithm,
@@ -123,9 +129,9 @@ func (r *BannerRotator) Get(ctx context.Context, slotId int64, groupId int64) (i
 		return 0, err
 	}
 
-	var data []alg_entities.AlgorithmData
+	var data []algentities.AlgorithmData
 	for _, stat := range statistics {
-		item := alg_entities.AlgorithmData{
+		item := algentities.AlgorithmData{
 			HandleId:  stat.BannerId,
 			Count:     stat.Buyouts,
 			AvgIncome: stat.Clicks,

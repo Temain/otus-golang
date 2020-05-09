@@ -20,16 +20,12 @@ func NewLogger(logFile string, level string) *logrus.Logger {
 	switch level {
 	case "info":
 		loggerLevel = logrus.InfoLevel
-		break
 	case "debug":
 		loggerLevel = logrus.DebugLevel
-		break
 	case "warn":
 		loggerLevel = logrus.WarnLevel
-		break
 	case "error":
 		loggerLevel = logrus.ErrorLevel
-		break
 	}
 	logger.SetLevel(loggerLevel)
 	return logger
