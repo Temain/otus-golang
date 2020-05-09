@@ -4,7 +4,7 @@ go 1.14
 
 require (
 	github.com/Temain/otus-golang/project/pkg/algorithm v0.0.0-20200505154543-0ed659742212
-	github.com/cenkalti/backoff/v3 v3.2.2 // indirect
+	github.com/cenkalti/backoff/v3 v3.2.2
 	github.com/cockroachdb/apd v1.1.0 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/golang/protobuf v1.4.0
@@ -15,7 +15,7 @@ require (
 	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/pflag v1.0.5
-	github.com/streadway/amqp v0.0.0-20200108173154-1c71cc93ed71 // indirect
+	github.com/streadway/amqp v0.0.0-20200108173154-1c71cc93ed71
 	golang.org/x/net v0.0.0-20190522155817-f3200d17e092 // indirect
 	google.golang.org/grpc v1.29.1
 	google.golang.org/protobuf v1.21.0
